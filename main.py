@@ -12,7 +12,7 @@ Usage:
     python main.py --skip-llm                         # skip LLM benchmark
 """
 
-import os, sys, json, argparse, logging, warnings, subprocess
+import os, sys, json, argparse, logging, warnings, subprocess, psutil
 from datetime import datetime
 
 os.environ["TRANSFORMERS_NO_TF"] = "1"
@@ -26,6 +26,10 @@ from edgeiot.config import PipelineConfig
 from edgeiot.data import DataLoader, DataPreprocessor, HierarchicalClusteringManager
 from edgeiot.models import ModelEvaluator, XGBoostWrapper, SequenceWindowGenerator, IsolationForestAnomalyDetector
 from edgeiot.semantic import SemanticTokenizer, TransformerEncoder, build_output_record, OllamaReasoner, CLUSTER_NAMES, discover_ollama_models, select_model_interactive
+try:
+    import GPUtil
+except ImportError:
+    GPUtil = None
 from edgeiot.viz import PipelineVisualizer
 
 # ── Logging ──────────────────────────────────────────────────────────────────
@@ -329,12 +333,42 @@ def main():
         p95_lat = df_bench["latency_ms"].quantile(0.95)
         avg_tps = df_bench["tokens_per_sec"].mean()
         avg_ram = df_bench["ram_mb"].mean()
+        avg_cpu = psutil.cpu_percent(interval=None)
+        import math
+        try:
+            gpus = GPUtil.getGPUs()
+            if gpus:
+                avg_gpu_load = sum(gpu.load for gpu in gpus) / len(gpus) * 100
+                avg_gpu_mem = sum(gpu.memoryUsed for gpu in gpus) / len(gpus)
+                # Replace NaN with 0 for display
+                if math.isnan(avg_gpu_load):
+                    avg_gpu_load = 0
+                if math.isnan(avg_gpu_mem):
+                    avg_gpu_mem = 0
+            else:
+                avg_gpu_load = 0
+                avg_gpu_mem = 0
+        except Exception:
+            avg_gpu_load = 0
+            avg_gpu_mem = 0
+        # Prepare GPU display strings handling NaN values
+        if isinstance(avg_gpu_load, float) and math.isnan(avg_gpu_load):
+            gpu_load_str = "0%"
+        else:
+            gpu_load_str = f"{avg_gpu_load:.1f}%"
+        if isinstance(avg_gpu_mem, float) and math.isnan(avg_gpu_mem):
+            gpu_mem_str = "0 MB"
+        else:
+            gpu_mem_str = f"{avg_gpu_mem:.1f} MB"
         summary += f"""
 ║  {cfg.ollama.model.upper()} ON JETSON ORIN NANO             ║
 ║    Avg latency      : {avg_lat:.1f} ms                        ║
 ║    P95 latency      : {p95_lat:.1f} ms                        ║
 ║    Avg tokens/sec   : {avg_tps:.1f}                           ║
-║    Avg RAM usage    : {avg_ram:.1f} MB                       ║"""
+║    Avg RAM usage    : {avg_ram:.1f} MB                       ║
+║    Avg CPU usage    : {avg_cpu:.1f}%                         ║
+║    Avg GPU load     : {gpu_load_str}                     ║
+║    Avg GPU mem usage: {gpu_mem_str}                   ║"""
 
     if df_eff is not None:
         summary += f"""

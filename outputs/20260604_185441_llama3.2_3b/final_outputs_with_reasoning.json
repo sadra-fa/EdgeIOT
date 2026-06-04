@@ -1,0 +1,134 @@
+[
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:58:26.308291+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]",
+      "[MOTION_ACTIVE]"
+    ],
+    "llm_reasoning": "It appears that the household is experiencing an unexpected disturbance during sleep, as indicated by the noise spike event, suggesting that someone may have entered or moved around while others are resting, and no further action is required at this time."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:58:26.317593+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[MOTION_ACTIVE]"
+    ],
+    "llm_reasoning": "It appears that the motion sensor has detected movement within the home, indicating that someone or something is active, but the predicted behavior suggests that it's unlikely to be a person who will stay awake for an extended period, so no immediate action is required."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:58:26.317939+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]"
+    ],
+    "llm_reasoning": "The high temperature sensor event indicates that the room's temperature has exceeded a predetermined threshold, triggering an active response to activate cooling or ventilation systems to maintain a comfortable indoor climate."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:58:26.318222+00:00",
+    "prediction": {
+      "label": 2,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[LOW_LIGHT]"
+    ],
+    "llm_reasoning": "It appears that the homeowner has left their residence while it's cold outside and dimly lit, triggering the smart home system to assume they are away from home, but no immediate action is required as this is a normal expected behavior for an \"away\" mode."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:58:26.318487+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]",
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]"
+    ],
+    "llm_reasoning": "It appears that the environment has reached an uncomfortable temperature and humidity level, triggering a noise spike, suggesting that someone may be sleeping or resting, and no immediate action is required as predicted behavior indicates they will remain asleep."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:58:26.318743+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_LOW]"
+    ],
+    "llm_reasoning": "The low humidity level is triggering the system to activate its dehumidification mechanism, which may require manual intervention or adjustment of the system's settings to maintain optimal indoor air quality."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:58:26.318991+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[NOISE_SPIKE]"
+    ],
+    "llm_reasoning": "A sudden noise spike has been detected, indicating potential disturbance or malfunction within the home, and I should trigger an alert to notify occupants and potentially initiate a response such as turning on lights or activating security cameras."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:58:26.319222+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 0.9990000128746033
+    },
+    "semantic_tokens": [],
+    "llm_reasoning": "The system is currently inactive, but it's predicted to become active soon, suggesting that the user may be approaching or has entered a room, prompting no immediate action but potentially triggering lighting or temperature adjustments upon activation."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:58:26.319445+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[HUMIDITY_LOW]"
+    ],
+    "llm_reasoning": "The system is detecting low temperature and humidity levels, indicating a potential issue with the heating or cooling system, and it's recommended to activate the HVAC system to maintain a comfortable indoor climate."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:58:26.319661+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [],
+    "llm_reasoning": "The system is currently inactive, but it's predicted to become active soon, suggesting that an event or trigger has been detected, and no immediate action is required at this point."
+  }
+]

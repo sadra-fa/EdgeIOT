@@ -1,0 +1,4 @@
+sample,cluster,behaviour,n_tokens_in,is_anomaly,latency_ms,tokens_out,tokens_per_sec,ram_mb,reasoning
+0,1,sleeping,3,False,2004.0,33,21.92,261.9,"The house is likely experiencing increased activity due to motion detected, but it's probably best to continue with the current sleep mode as humidity is high."
+1,1,sleeping,1,False,1981.3,36,24.21,261.9,"It's likely someone is asleep based on motion detection, so I should adjust the smart home settings accordingly (e.g., turn off lights, lower thermostat)."
+2,0,active,1,False,1473.4,20,23.88,261.7,"The temperature has exceeded the threshold, so I will activate cooling features to maintain comfort."

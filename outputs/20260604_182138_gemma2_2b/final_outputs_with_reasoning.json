@@ -1,0 +1,129 @@
+[
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:25:30.680820+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]",
+      "[MOTION_ACTIVE]"
+    ],
+    "llm_reasoning": "The house is becoming more active with the presence of motion and a spike in noise, so it's likely preparing for sleep by dimming lights and lowering temperature."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:25:30.681219+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[MOTION_ACTIVE]"
+    ],
+    "llm_reasoning": "It's likely someone is asleep based on the motion event, so I should adjust the smart home settings to reflect that (e.g., turn off lights, lower thermostat)."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:25:30.681421+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]"
+    ],
+    "llm_reasoning": "The temperature is high, so the system should activate cooling features or adjust settings to maintain comfort."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:25:30.681609+00:00",
+    "prediction": {
+      "label": 2,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[LOW_LIGHT]"
+    ],
+    "llm_reasoning": "It's likely the homeowner has left the house, indicated by low light and temperature, so I should adjust the smart home settings accordingly."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:25:30.681822+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]",
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]"
+    ],
+    "llm_reasoning": "It's likely the house is getting too warm and humid, prompting the smart home to enter sleep mode to conserve energy."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:25:30.682011+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_LOW]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:25:30.682191+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[NOISE_SPIKE]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:25:30.682370+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 0.9990000128746033
+    },
+    "semantic_tokens": []
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:25:30.682545+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[HUMIDITY_LOW]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T17:25:30.682716+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": []
+  }
+]
