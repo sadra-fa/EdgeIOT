@@ -1,0 +1,129 @@
+[
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T13:53:50.721857+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]",
+      "[MOTION_ACTIVE]"
+    ],
+    "llm_reasoning": "It appears that the homeowner is likely waking up from sleep, triggering a noise spike due to movement, and an increase in humidity may be related to morning dew or showering; no immediate action is required but monitoring for prolonged high humidity or excessive noise spikes may be warranted."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T13:53:50.722298+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[MOTION_ACTIVE]"
+    ],
+    "llm_reasoning": "It appears that the motion sensor has detected movement within the home, indicating that someone is likely awake and active, but since the predicted behavior suggests they should be sleeping, no immediate action is required unless further verification or notification is desired."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T13:53:50.722496+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]"
+    ],
+    "llm_reasoning": "The high temperature sensor event indicates that the room's temperature has exceeded a predetermined threshold, triggering an alert to activate the cooling system or other measures to maintain a safe indoor environment."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T13:53:50.722679+00:00",
+    "prediction": {
+      "label": 2,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[LOW_LIGHT]"
+    ],
+    "llm_reasoning": "It appears that the occupant has left the house, as indicated by the \"away\" prediction, and it's recommended to adjust the lighting levels and temperature settings accordingly to conserve energy and maintain a comfortable environment."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T13:53:50.722855+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]",
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]"
+    ],
+    "llm_reasoning": "It appears that the environment has reached an uncomfortable temperature and humidity level, triggering a noise spike, suggesting that someone may be stirring or getting out of bed during sleep, indicating that it's time to adjust the thermostat and turn off any unnecessary lights to help the person get back to sleep."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T13:53:50.723026+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_LOW]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T13:53:50.723193+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[NOISE_SPIKE]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T13:53:50.723358+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 0.9990000128746033
+    },
+    "semantic_tokens": []
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T13:53:50.723522+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[HUMIDITY_LOW]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T13:53:50.723684+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": []
+  }
+]

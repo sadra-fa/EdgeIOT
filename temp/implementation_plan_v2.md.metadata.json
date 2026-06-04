@@ -1,0 +1,6 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary":  "Implementation plan for three enhancements to the EdgeIOT pipeline:\n1. Structured plot output folders — group images into named subfolders by pipeline stage (01_data_exploration, 02_clustering, 03_classification, etc.)\n2. Python package reorganisation — move flat .py files into edgeiot/ package with sub-packages: data/, models/, semantic/, viz/\n3. Interactive Ollama model selection — run 'ollama list' at startup, display a numbered menu, and let the user pick which LLM to use.\nIncludes execution order, file change details, and task checklist.",
+  "updatedAt":  "2026-06-04T09:25:22.857072288Z",
+  "requestFeedback":  true
+}

@@ -1,0 +1,124 @@
+[
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T09:12:10.352603+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]",
+      "[MOTION_ACTIVE]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T09:12:10.353124+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[MOTION_ACTIVE]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T09:12:10.353342+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T09:12:10.353542+00:00",
+    "prediction": {
+      "label": 2,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[LOW_LIGHT]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T09:12:10.353766+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]",
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T09:12:10.353970+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_LOW]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T09:12:10.354161+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[NOISE_SPIKE]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T09:12:10.354342+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 0.9990000128746033
+    },
+    "semantic_tokens": []
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T09:12:10.354516+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[HUMIDITY_LOW]"
+    ]
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T09:12:10.354687+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": []
+  }
+]

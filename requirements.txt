@@ -1,0 +1,11 @@
+numpy
+pandas
+matplotlib
+seaborn
+scipy
+scikit-learn
+xgboost
+shap
+transformers
+requests
+psutil
