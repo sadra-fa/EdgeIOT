@@ -1,0 +1,134 @@
+[
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T20:53:37.176570+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]",
+      "[MOTION_ACTIVE]"
+    ],
+    "llm_reasoning": "The smart home system detects high humidity, an increase in noise level possibly from snoring or movement within the house, along with active motion sensors indicating someone may be moving around; considering these signs combined with a predicted sleeping behavior, it's likely that one of the occupants is asleep and no immediate action is required unless comfort adjustments are necessary."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T20:53:37.177192+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[MOTION_ACTIVE]"
+    ],
+    "llm_reasoning": "A person is most likely still asleep since motion has been detected but no specific behavior indicating wakefulness or activity requiring immediate attention has occurred; however, it may be prudent to monitor for a period longer before assuming the individual has fully awakened and normal activities have resumed."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T20:53:37.177440+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]"
+    ],
+    "llm_reasoning": "The indoor temperature has risen above the normal range, triggering an 'active' response to engage cooling systems or alert occupants for potential heat-related issues; immediate activation of air conditioning may be necessary depending on comfort settings and health considerations."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T20:53:37.177657+00:00",
+    "prediction": {
+      "label": 2,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[LOW_LIGHT]"
+    ],
+    "llm_reasoning": "The temperature has dropped to a low level and the lighting conditions are dim or dark, suggesting it's nighttime; no immediate action required unless adjustments for comfort are desired by the occupants who might be away."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T20:53:37.177859+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]",
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]"
+    ],
+    "llm_reasoning": "The smart home system detects unusually high temperature and humidity combined with a noise spike, suggesting someone may be experiencing discomfort or an emergency; it might activate climate control to cool down the environment and alert occupants for further assessment if necessary."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T20:53:37.178058+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_LOW]"
+    ],
+    "llm_reasoning": "The humidity level is dropping below the desired range in your smart home, indicating a potential for discomfort or damage to sensitive items; therefore, it may be beneficial to activate a dehumidifier or adjust indoor activities accordingly."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T20:53:37.178246+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[NOISE_SPIKE]"
+    ],
+    "llm_reasoning": "A noise spike has been detected by the sensors in your smart home; it's likely an event of interest or disturbance that may warrant checking for potential security concerns or simply acknowledging a significant increase in ambient sound, depending on context. No immediate action seems necessary unless further details suggest otherwise (e.g., if this is outside expected activity hours)."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T20:53:37.178427+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 0.9990000128746033
+    },
+    "semantic_tokens": [],
+    "llm_reasoning": "Given the current 'NO_EVENT' status but predicted behavior as 'active,' it suggests that no immediate sensor events are detected; however, an expected activity or condition may soon occur in the smart home environment, indicating a potential need for monitoring readiness without requiring any specific action at this moment."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T20:53:37.178608+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[HUMIDITY_LOW]"
+    ],
+    "llm_reasoning": "The indoor temperature and humidity levels are low, suggesting it's cold and dry; the smart home system should activate heating and possibly a humidifier to maintain comfortable living conditions."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-04T20:53:37.178791+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [],
+    "llm_reasoning": "Given no current sensor events but predicted 'active' behavior, it suggests that the smart home system anticipates regular activity; however, without specific data indicating unusual or concerning situations, no immediate action may be required unless there are pre-set conditions for alerts in case of unexpected changes."
+  }
+]

@@ -28,6 +28,7 @@ A comprehensive edge AI pipeline for smart home sensor data. This project proces
    - Performs offline semantic reasoning using lightweight, edge-compatible models (e.g., Llama 3.2, Phi-3).
    - Evaluates LLM performance metrics (latency, tokens/sec, RAM footprint).
    - Includes a token efficiency benchmark comparing reasoning on raw numeric data vs. semantic tokens.
+   - Added CPU usage, GPU load, and GPU memory usage metrics to benchmark summary.
 
 6. **Rich Visualizations**
    - Automatically generates a complete suite of plots in the `outputs/` directory.
