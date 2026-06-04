@@ -31,8 +31,9 @@ from edgeiot.viz import PipelineVisualizer
 # ── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s  %(levelname)-8s  %(name)s — %(message)s",
+    format="[%(asctime)s] %(message)s",
     datefmt="%H:%M:%S",
+    force=True
 )
 logger = logging.getLogger("pipeline")
 
@@ -89,26 +90,26 @@ def main():
 
     viz = PipelineVisualizer(output_dir=cfg.plots_dir)
 
-    # ══════════════════════════════════════════════════════════════════════
-    # 1. LOAD & CLEAN
-    # ══════════════════════════════════════════════════════════════════════
+    print("\n" + "═"*70)
+    print(" 1. LOAD & CLEAN")
+    print("═"*70)
     loader = DataLoader(cfg.data_path)
     df = loader.load_and_clean()
 
-    # ══════════════════════════════════════════════════════════════════════
-    # 2. ENCODE + NORMALIZE
-    # ══════════════════════════════════════════════════════════════════════
+    print("\n" + "═"*70)
+    print(" 2. ENCODE + NORMALIZE")
+    print("═"*70)
     preprocessor = DataPreprocessor(cfg.preprocessing)
     X_processed = preprocessor.preprocess(df)
 
-    # ══════════════════════════════════════════════════════════════════════
-    # 3. SENSOR TIME-SERIES PLOT
-    # ══════════════════════════════════════════════════════════════════════
+    print("\n" + "═"*70)
+    print(" 3. SENSOR TIME-SERIES PLOT")
+    print("═"*70)
     viz.plot_timeseries(X_processed, cfg.preprocessing.sensor_cols[:3])
 
-    # ══════════════════════════════════════════════════════════════════════
-    # 4. PCA + HIERARCHICAL CLUSTERING
-    # ══════════════════════════════════════════════════════════════════════
+    print("\n" + "═"*70)
+    print(" 4. PCA + HIERARCHICAL CLUSTERING")
+    print("═"*70)
     X_dense = X_processed.values
     pca = PCA(n_components=2)
     X_pca_2d = pca.fit_transform(X_dense)
@@ -121,9 +122,9 @@ def main():
     )
     viz.plot_pca_clustering(X_pca_2d, pseudo_labels)
 
-    # ══════════════════════════════════════════════════════════════════════
-    # 5. TRAIN / TEST SPLIT
-    # ══════════════════════════════════════════════════════════════════════
+    print("\n" + "═"*70)
+    print(" 5. TRAIN / TEST SPLIT")
+    print("═"*70)
     X_train, X_test, y_train, y_test = preprocessor.split_data(
         X_processed, pseudo_labels
     )
@@ -167,9 +168,9 @@ def main():
         [c.accuracy for c in classifiers],
     )
 
-    # ══════════════════════════════════════════════════════════════════════
-    # 9. SHAP
-    # ══════════════════════════════════════════════════════════════════════
+    print("\n" + "═"*70)
+    print(" 9. SHAP")
+    print("═"*70)
     try:
         shap_values, _ = evaluator.compute_shap_values(xgb_clf.model, X_test)
         viz.plot_shap_beeswarm(shap_values)
@@ -177,9 +178,9 @@ def main():
     except Exception as e:
         logger.warning(f"SHAP skipped: {e}")
 
-    # ══════════════════════════════════════════════════════════════════════
-    # 10. TIME-WINDOW ANOMALY DETECTION
-    # ══════════════════════════════════════════════════════════════════════
+    print("\n" + "═"*70)
+    print(" 10. TIME-WINDOW ANOMALY DETECTION")
+    print("═"*70)
     window_gen = SequenceWindowGenerator(
         cfg.preprocessing.sensor_cols, cfg.anomaly.window_size
     )
@@ -190,9 +191,9 @@ def main():
 
     viz.plot_anomaly_scores(anomaly_detector.scores, anomaly_detector.labels)
 
-    # ══════════════════════════════════════════════════════════════════════
-    # 11. SEMANTIC TOKENIZATION
-    # ══════════════════════════════════════════════════════════════════════
+    print("\n" + "═"*70)
+    print(" 11. SEMANTIC TOKENIZATION")
+    print("═"*70)
     tokenizer = SemanticTokenizer()
 
     outputs = []
@@ -215,9 +216,9 @@ def main():
     )
     viz.plot_token_distribution(token_counts)
 
-    # ══════════════════════════════════════════════════════════════════════
-    # 12. LLM REASONING (optional)
-    # ══════════════════════════════════════════════════════════════════════
+    print("\n" + "═"*70)
+    print(" 12. LLM REASONING (optional)")
+    print("═"*70)
     df_bench = None
     df_eff   = None
     n_anom   = anomaly_detector.n_anomalies
@@ -290,9 +291,9 @@ def main():
     else:
         logger.info("LLM reasoning skipped (--skip-llm).")
 
-    # ══════════════════════════════════════════════════════════════════════
-    # 13. SAVE ALL OUTPUTS
-    # ══════════════════════════════════════════════════════════════════════
+    print("\n" + "═"*70)
+    print(" 13. COMPILE FINAL JSON OUTPUT")
+    print("═"*70)
     with open(f"{cfg.output_dir}/semantic_outputs.json", "w") as f:
         json.dump(outputs, f, indent=2)
 
@@ -302,9 +303,9 @@ def main():
     logger.info("\nFINAL OUTPUT EXAMPLE (with LLM reasoning):")
     logger.info(json.dumps(outputs[0], indent=2))
 
-    # ══════════════════════════════════════════════════════════════════════
-    # 14. DISSERTATION SUMMARY
-    # ══════════════════════════════════════════════════════════════════════
+    print("\n" + "═"*70)
+    print(" 14. DISSERTATION SUMMARY")
+    print("═"*70)
     dt_acc = classifiers[0].accuracy
     rf_acc = classifiers[1].accuracy
     xgb_acc = classifiers[2].accuracy
