@@ -14,7 +14,7 @@
 
 1. Export the existing LLM reasoning outputs into a LoRA‑compatible JSONL file.
 2. Pull the 3 B LLaMA model with the Ollama CLI.
-3. Convert the Ollama GGUF model to a PyTorch checkpoint that `peft`/`bitsandbytes` can load.
+3. Load the Hugging Face LLaMA 3.2 (3 B) checkpoint (e.g., `consolidated.00.pth`) directly with Transformers for QLoRA fine‑tuning.
 4. Fine‑tune the model with **4‑bit QLoRA** on the exported corpus.
 5. Convert the fine‑tuned checkpoint back to GGUF and register it with Ollama.
 6. Swap the pipeline to use the new model and re‑run the full benchmark.
@@ -39,6 +39,7 @@ src = pathlib.Path('outputs/semantic_outputs.json')
 records = json.load(src)
 out = pathlib.Path('train_data.jsonl')
 with out.open('w') as f:
+
     for r in records:
         prompt = " ".join(r['semantic_tokens'])
         response = r['llm_reasoning']
@@ -49,27 +50,26 @@ PY
 
 ---
 
-### 2️⃣ Pull LLaMA 3.2 (3 B) via Ollama
+### 2️⃣ Download LLaMA 3.2 (3 B) from Hugging Face
 
 | Action | Command |
 |--------|---------|
-| **🛠️ 2.1** Pull the model | `ollama pull llama3.2:3b` |
-| **🛠️ 2.2** Confirm it is installed | `ollama list` *(should show `llama3.2:3b`)* |
+| **🛠️ 2.1** Download the checkpoint (e.g., `consolidated.00.pth`) using the Hugging Face CLI or `git lfs` | `git lfs install && git clone https://huggingface.co/<org>/llama-3.2-3b && cd llama-3.2-3b && ls -lh` |
+| **🛠️ 2.2** Verify the file exists (`ls -lh consolidated.00.pth`) | `ls -lh ./consolidated.00.pth` |
 
 ---
 
-### 3️⃣ Convert Ollama GGUF → PyTorch checkpoint (for LoRA)
+### 3️⃣ Load Hugging Face checkpoint (for LoRA)
 
 | Action | Command | Explanation |
 |--------|---------|-------------|
-| **🛠️ 3.1** Create a folder for the conversion | `mkdir -p ./ollama_llama3` |
-| **🛠️ 3.2** Export the GGUF file from Ollama | `ollama export llama3.2:3b ./ollama_llama3/llama3.2_3b.gguf` |
-| **🛠️ 3.3** Install `transformers` ≥ 4.40 (supports GGUF) | `pip install --upgrade transformers` |
-| **🛠️ 3.4** Load the GGUF into a PyTorch model (creates a cache folder) | ```python
+| **🛠️ 3.1** Install `transformers` ≥ 4.40 | `pip install --upgrade transformers` |
+| **🛠️ 3.2** Load the checkpoint with `AutoModelForCausalLM` (4‑bit) | ```python
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-model_path = "./ollama_llama3/llama3.2_3b.gguf"
+model_path = "./consolidated.00.pth"
 model = AutoModelForCausalLM.from_pretrained(
+
     model_path,
     torch_dtype=torch.float16,
     device_map="auto",
@@ -80,8 +80,9 @@ tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
 model.save_pretrained("./base_llama3_4bit")
 tokenizer.save_pretrained("./base_llama3_4bit")
 print("Base 4‑bit checkpoint saved to ./base_llama3_4bit")
+
 ``` |
-| **🛠️ 3.5** Verify the checkpoint exists (`./base_llama3_4bit/pytorch_model.bin`). | `ls -R ./base_llama3_4bit` |
+| **🛠️ 3.3** Verify the checkpoint exists (`./base_llama3_4bit/pytorch_model.bin`) | `ls -R ./base_llama3_4bit` |
 
 ---
 
