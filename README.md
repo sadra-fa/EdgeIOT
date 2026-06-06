@@ -72,6 +72,20 @@ python scripts/03_load_hf_checkpoint.py \
     --model_dir ./languagemodels/Llama-3.2-3B \
     --output_dir ./base_llama3_4bit
 ```
+
+**Inputs**
+- `--model_dir`: Path to the original HuggingFace LLaMA 3.2 checkpoint directory.
+- `--output_dir`: Destination directory for the quantized model (`base_llama3_4bit`).
+
+**Outputs**
+- A directory containing the quantized model files ready for LoRA fine‑tuning.
+
+
+```bash
+python scripts/03_load_hf_checkpoint.py \
+    --model_dir ./languagemodels/Llama-3.2-3B \
+    --output_dir ./base_llama3_4bit
+```
 ### QLoRA Fine‑tuning (Script 04)
 
 ```bash
@@ -81,6 +95,18 @@ python3 scripts/04_qlora_finetune.py \
     --output_dir ./fine_tuned_llama3_lora \
     --epochs 3 \
     --batch_size 4
+```
+**Inputs**
+- `--model_dir`: Path to the base model directory (quantized 4-bit model).
+- `--train_file_dir`: Directory containing the `train_data.jsonl` file.
+- `--output_dir`: Directory where the fine‑tuned LoRA adapter and tokenizer will be saved.
+- `--epochs`: Number of training epochs.
+- `--batch_size`: Training batch size.
+
+**Outputs**
+- Fine‑tuned LoRA adapter saved in `--output_dir`.
+- Updated tokenizer saved in the same folder.
+- Training logs printed to console.
 ```
 
 
