@@ -63,6 +63,27 @@ Run the main pipeline script:
 python main.py
 ```
 
+### Additional Scripts
+
+- **`scripts/03_load_hf_checkpoint.py`** – Loads a locally‑downloaded Hugging Face LLaMA 3.2 checkpoint, applies 4‑bit quantization with bitsandbytes, and saves a ready‑to‑fine‑tune model (`base_llama3_4bit`). This script is the first step of the fine‑tuning pipeline on the Jetson Orin Nano.
+
+```bash
+python scripts/03_load_hf_checkpoint.py \
+    --model_dir ./languagemodels/Llama-3.2-3B \
+    --output_dir ./base_llama3_4bit
+```
+### QLoRA Fine‑tuning (Script 04)
+
+```bash
+python3 scripts/04_qlora_finetune.py \
+    --model_dir ./languagemodels/llama-3.2-3B-think-fp16-fused-v6 \
+    --train_file_dir ./outputs/20260604_225550_llama3.2_3b \
+    --output_dir ./fine_tuned_llama3_lora \
+    --epochs 3 \
+    --batch_size 4
+```
+
+
 ### Command-line Arguments
 
 - `--data <path>`: Specify the path to the CSV dataset (default is `RealLife.csv` as configured).
