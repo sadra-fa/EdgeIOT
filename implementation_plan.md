@@ -28,7 +28,15 @@ mkdir -p outputs/baseline_$(date +%Y%m%d_%H%M%S)
 cp jetson_benchmark.csv outputs/baseline_$(date +%Y%m%d_%H%M%S)/
 ``` | Keeps a reproducible snapshot of the pre‑fine‑tuning system.
 
-These steps give you a solid reference point (latency, GPU load, BLEU) before any fine‑tuning is applied. After fine‑tuning you will repeat steps 0.1–0.3 (renamed to 6️⃣‑7️⃣ in the original plan) and compare the new `fine_tuned_metrics.csv` against `baseline_metrics.csv`.
+# 🚀 Demo: Pre‑Fine‑Tuning Smart‑Home Edge
+
+We will run a single‑shot demo that simulates sensor data, builds a prompt, queries the local Ollama LLaMA 3.2 model, parses the reply into a JSON action, and logs everything to a timestamped CSV file (`baseline_demo_YYYYMMDD_HHMMSS.csv`). This provides a concrete baseline for later fine‑tuned comparisons.
+
+**Steps**
+1. `python scripts/simulate_sensors.py -n 1` – generate one sensor reading.
+2. `python scripts/run_demo.py -n 1` – invoke the brain, store results in `outputs/`.
+3. Review the CSV and note latency, raw reply, and parsed action.
+
 
 1. Export the existing LLM reasoning outputs into a LoRA‑compatible JSONL file.
 2. Pull the 3 B LLaMA model with the Ollama CLI.
