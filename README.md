@@ -81,12 +81,15 @@ EdgeIOT/
 
 - Python 3.10+
 - Install dependencies:
+
   ```bash
   pip install -r requirements.txt
   # or manually:
   pip install pandas numpy scikit-learn xgboost matplotlib seaborn shap requests
   ```
+
 - [Ollama](https://ollama.com/) must be installed and running locally with at least one model pulled:
+
   ```bash
   ollama pull llama3.2:3b
   ollama serve          # keep running in a separate terminal
@@ -205,12 +208,14 @@ python scripts/stream_demo.py --interval 10 --model llama3.2:3b --outdir results
 | `--outdir` | Directory to store the CSV log | `outputs/` |
 
 **What happens each cycle:**
+
 1. `simulate_sensors.py` generates a sensor snapshot (temp, motion, noise).
 2. `edgeiot/brain.py` builds a `hybrid` prompt and queries the local Ollama instance.
 3. The LLM reply is parsed into a structured JSON action.
 4. The result is printed to the terminal and appended to `outputs/stream_demo.csv`.
 
 **Terminal output example:**
+
 ```
 ╔══════════════════════════════════════════════╗
 ║   EdgeIOT Smart-Home Stream (on-device LLM)  ║
