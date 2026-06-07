@@ -1,0 +1,29 @@
+timestamp,temperature,motion,noise,prompt_style,prompt,raw_reply,action_json,latency_ms,model
+2026-06-07T11:02:40.711897+00:00,58.0,True,65.5,hybrid,"You are an AI assistant embedded in a smart-home edge device.
+The sensors currently report:
+  • Temperature : 58.0 °C
+  • Motion detected : yes
+  • Noise level : 65.5 dB
+
+Based on this information, decide what action the smart home should take.  Reply in one concise paragraph.","Given the current sensor readings, I recommend taking no immediate action, but rather monitoring the situation for a short period to confirm the motion detection is not a false alarm. The high temperature of 58.0 °C may indicate an issue with the device's cooling system or a malfunction in the thermal sensors. Meanwhile, the moderate noise level of 65.5 dB suggests that it might be a normal household activity rather than an unusual event. I suggest sending a notification to the homeowner's smartphone with a brief summary of the current sensor readings and instructing them to investigate the situation further before taking any corrective action.","{""action"": ""security_alert""}",16189.44,llama3.2:3b
+2026-06-07T11:03:08.230145+00:00,60.6,False,184.3,hybrid,"You are an AI assistant embedded in a smart-home edge device.
+The sensors currently report:
+  • Temperature : 60.6 °C
+  • Motion detected : no
+  • Noise level : 184.3 dB
+
+Based on this information, decide what action the smart home should take.  Reply in one concise paragraph.","Given the high temperature reading of 60.6°C and the extremely loud noise level of 184.3 dB, it is likely that a fire or other safety hazard is present. To mitigate this risk, I recommend triggering an alert to the homeowner's smartphone or smart speaker, which can then prompt them to evacuate the premises immediately. Additionally, if available, the system could also activate the home's fire suppression system or security response protocol to ensure the homeowner's safety.","{""action"": ""other"", ""note"": ""no recognised keyword matched""}",5546.58,llama3.2:3b
+2026-06-07T11:03:18.557140+00:00,56.5,False,111.6,hybrid,"You are an AI assistant embedded in a smart-home edge device.
+The sensors currently report:
+  • Temperature : 56.5 °C
+  • Motion detected : no
+  • Noise level : 111.6 dB
+
+Based on this information, decide what action the smart home should take.  Reply in one concise paragraph.","Based on the current sensor readings, I recommend taking no immediate action. The temperature of 56.5 °C is slightly above normal, but not excessively high to warrant intervention. The absence of motion detection and noise level within a moderate range indicates that there are no urgent safety concerns or disturbances requiring attention. However, I suggest sending an alert to the homeowner's notification system with a gentle reminder to check on the temperature and consider adjusting it if necessary, while also providing suggestions for cooling measures such as opening windows or using fans.","{""action"": ""no_action""}",6074.40,llama3.2:3b
+2026-06-07T11:03:38.544802+00:00,56.6,False,55.6,hybrid,"You are an AI assistant embedded in a smart-home edge device.
+The sensors currently report:
+  • Temperature : 56.6 °C
+  • Motion detected : no
+  • Noise level : 55.6 dB
+
+Based on this information, decide what action the smart home should take.  Reply in one concise paragraph.","Based on the current sensor readings, there is no indication of an immediate safety concern or unusual activity that requires attention. The temperature is within a normal range for most homes, and the motion detection system has not triggered. However, the noise level of 55.6 dB is slightly above the recommended threshold, suggesting potential disturbance or disruption in the home. To mitigate this, I recommend activating the smart home's ambient lighting to create a calming atmosphere and potentially reducing the noise level through the smart speaker's volume adjustment or by initiating a white noise generator to mask any unwanted sounds.","{""action"": ""other"", ""note"": ""no recognised keyword matched""}",7430.45,llama3.2:3b
