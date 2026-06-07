@@ -31,7 +31,7 @@ from scripts.simulate_sensors import generate_reading   # noqa: E402
 from edgeiot.brain import run as brain_run               # noqa: E402
 from edgeiot.config import OllamaConfig                  # noqa: E402
 
-
+# CSV field definitions (including model column)
 FIELDNAMES = [
     "timestamp",
     "temperature",
@@ -42,6 +42,7 @@ FIELDNAMES = [
     "raw_reply",
     "action_json",
     "latency_ms",
+    "model",
 ]
 
 
@@ -75,8 +76,8 @@ def main():
     # Prepare output directory and CSV file
     out_dir = Path(args.outdir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    ts_label = datetime.now().strftime("%Y%m%d_%H%M%S")
-    csv_path = out_dir / f"baseline_demo_{ts_label}.csv"
+    # Use a single persistent CSV file for all runs
+    csv_path = out_dir / "baseline_demo.csv"
 
     config = OllamaConfig(model=args.model)
 
@@ -90,10 +91,12 @@ def main():
     print(f"╚══════════════════════════════════════════════╝")
     print()
 
-    with csv_path.open("w", newline="") as f:
+    # Append to existing CSV; write header only if file is new
+    file_exists = csv_path.exists()
+    with csv_path.open("a", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
-        writer.writeheader()
-
+        if not file_exists:
+            writer.writeheader()
         for i in range(args.num):
             # 1. Simulate a sensor reading
             sensor = generate_reading()
@@ -106,7 +109,7 @@ def main():
             # 2. Send to brain (prompt + Ollama + parse)
             result = brain_run(sensor, config=config, style=args.style)
 
-            print(f"  LLM    → {result['raw_reply'][:120]}{'…' if len(result['raw_reply']) > 120 else ''}")
+            print(f"  LLM    → {result['raw_reply'][:500]}{'…' if len(result['raw_reply']) > 500 else ''}")
             print(f"  Action → {json.dumps(result['action'])}")
             print(f"  Latency: {result['latency_ms']:.0f} ms")
             print()
@@ -122,6 +125,7 @@ def main():
                 "raw_reply":    result["raw_reply"],
                 "action_json":  json.dumps(result["action"]),
                 "latency_ms":   f"{result['latency_ms']:.2f}",
+                "model":        args.model,
             })
             f.flush()   # make sure partial results survive crashes
 

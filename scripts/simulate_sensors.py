@@ -19,9 +19,9 @@ def generate_reading() -> dict:
     """Return a single simulated sensor snapshot."""
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "temperature": round(random.uniform(18.0, 35.0), 1),   # °C
+        "temperature": round(random.uniform(55.0, 65.0), 1),   # °C
         "motion": random.choice([True, False]),
-        "noise": round(random.uniform(25.0, 85.0), 1),         # dB
+        "noise": round(random.uniform(25.0, 185.0), 1),         # dB
     }
 
 
