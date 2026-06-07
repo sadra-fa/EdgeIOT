@@ -128,5 +128,40 @@ When running without `--model` or `--skip-llm`, the script will:
 All outputs and plots are saved to a timestamped folder inside the `outputs/` directory (e.g., `outputs/20260604_140337_llama3.2_3b/`).
 - `plots/`: Contains subdirectories for each stage of the pipeline with generated PNG charts.
 - `jetson_benchmark.csv`: Per-sample LLM reasoning statistics.
-- `token_efficiency.csv`: Comparative latency metrics for raw vs. semantic prompt inference.
+
+## 🚀 Quick Demo – Pre-Fine-Tuning Smart-Home Edge IoT
+
+Run a single-shot smart-home demo to see the base LLaMA 3.2 (3 B) model
+reasoning about simulated sensor data **before** any fine-tuning:
+
+```bash
+# Single reading (default)
+python scripts/run_demo.py
+
+# 5 readings, batch mode
+python scripts/run_demo.py -n 5
+
+# 5 readings with 2-second intervals (simulated stream)
+python scripts/run_demo.py -n 5 -i 2
+
+# Use a different prompt style
+python scripts/run_demo.py -n 3 --style compact
+```
+
+### What happens
+
+1. `simulate_sensors.py` generates a JSON reading with **temperature** (°C), **motion** (bool), and **noise** (dB).
+2. `edgeiot/brain.py` builds a natural-language prompt and sends it to the local Ollama instance (`llama3.2:3b`).
+3. The LLM returns a **plain-text** reply; the brain module also extracts a **JSON-structured action** (e.g., `{"action": "adjust_ac"}`).
+4. Everything is logged to `outputs/baseline_demo_YYYYMMDD_HHMMSS.csv` with columns: `timestamp`, `temperature`, `motion`, `noise`, `prompt_style`, `prompt`, `raw_reply`, `action_json`, `latency_ms`.
+
+### Prompt styles
+
+| Style | Description |
+|-------|-------------|
+| `hybrid` (default) | Friendly description with bullet-pointed sensor values |
+| `compact` | Terse one-liner |
+| `raw` | Dumps the raw JSON into the prompt |
+
+After fine-tuning, re-run the same demo to compare the LLM replies and latency against this baseline.
 

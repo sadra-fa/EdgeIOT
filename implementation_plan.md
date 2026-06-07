@@ -12,6 +12,24 @@
 
 ## Overview of the workflow
 
+### 0️⃣ Baseline EdgeIOT system build & data collection
+
+| Action | Command / Code | Reason |
+|--------|----------------|--------|
+| **🛠️ 0.1** Set up the full EdgeIOT pipeline with the base 4‑bit model (`base_llama3_4bit`). | ```bash
+python main.py --model base_llama3_4bit
+
+``` | Run the entire pipeline (data ingestion, reasoning, visualization) using the quantized base model to obtain baseline performance.
+| **🛠️ 0.2** Record benchmark metrics (latency, GPU utilization, memory, BLEU) using the existing `benchmark.py` script. | ```bash
+python scripts/benchmark.py --output baseline_metrics.csv
+``` | Capture a CSV of per‑run stats for later comparison.
+| **🛠️ 0.3** Store the baseline outputs and logs in a timestamped folder. | ```bash
+mkdir -p outputs/baseline_$(date +%Y%m%d_%H%M%S)
+cp jetson_benchmark.csv outputs/baseline_$(date +%Y%m%d_%H%M%S)/
+``` | Keeps a reproducible snapshot of the pre‑fine‑tuning system.
+
+These steps give you a solid reference point (latency, GPU load, BLEU) before any fine‑tuning is applied. After fine‑tuning you will repeat steps 0.1–0.3 (renamed to 6️⃣‑7️⃣ in the original plan) and compare the new `fine_tuned_metrics.csv` against `baseline_metrics.csv`.
+
 1. Export the existing LLM reasoning outputs into a LoRA‑compatible JSONL file.
 2. Pull the 3 B LLaMA model with the Ollama CLI.
 3. Load the Hugging Face LLaMA 3.2 (3 B) checkpoint (e.g., `consolidated.00.pth`) directly with Transformers for QLoRA fine‑tuning.
