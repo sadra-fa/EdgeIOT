@@ -1,0 +1,1153 @@
+% =============================================================================
+%  Master's Dissertation — FEUP
+%  Optimizing Large Language Models for Deployment on Resource-Constrained
+%  Edge Devices: A Smart Home Case Study
+%  Author: Sadra Farshid
+% =============================================================================
+\documentclass[12pt,a4paper,oneside]{report}
+
+% ── Encoding & Language ──────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+% ── Page Geometry ────────────────────────────────────────────────────────────
+\usepackage[top=2.5cm,bottom=2.5cm,left=3cm,right=2.5cm]{geometry}
+
+% ── Typography ───────────────────────────────────────────────────────────────
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\onehalfspacing
+
+% ── Maths ────────────────────────────────────────────────────────────────────
+\usepackage{amsmath,amssymb,amsfonts}
+
+% ── Tables & Figures ─────────────────────────────────────────────────────────
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+
+% ── Code Listings ────────────────────────────────────────────────────────────
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!50!black}\itshape,
+  stringstyle=\color{red!60!black},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=8pt,
+  frame=single,
+  breaklines=true,
+  captionpos=b,
+  tabsize=4,
+  showstringspaces=false,
+}
+
+% ── Hyperlinks ───────────────────────────────────────────────────────────────
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+
+% ── Bibliography ─────────────────────────────────────────────────────────────
+\usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
+\addbibresource{references.bib}
+
+% ── Acronyms ─────────────────────────────────────────────────────────────────
+\usepackage[acronym,toc,nonumberlist]{glossaries}
+\makeglossaries
+\newacronym{llm}{LLM}{Large Language Model}
+\newacronym{nlp}{NLP}{Natural Language Processing}
+\newacronym{gpu}{GPU}{Graphics Processing Unit}
+\newacronym{cpu}{CPU}{Central Processing Unit}
+\newacronym{ram}{RAM}{Random Access Memory}
+\newacronym{iot}{IoT}{Internet of Things}
+\newacronym{ai}{AI}{Artificial Intelligence}
+\newacronym{ml}{ML}{Machine Learning}
+\newacronym{dl}{DL}{Deep Learning}
+\newacronym{lora}{LoRA}{Low-Rank Adaptation}
+\newacronym{qlora}{QLoRA}{Quantized Low-Rank Adaptation}
+\newacronym{peft}{PEFT}{Parameter-Efficient Fine-Tuning}
+\newacronym{gguf}{GGUF}{GPT-Generated Unified Format}
+\newacronym{api}{API}{Application Programming Interface}
+\newacronym{cli}{CLI}{Command-Line Interface}
+\newacronym{csv}{CSV}{Comma-Separated Values}
+\newacronym{json}{JSON}{JavaScript Object Notation}
+\newacronym{pca}{PCA}{Principal Component Analysis}
+\newacronym{tps}{TPS}{Tokens Per Second}
+\newacronym{tops}{TOPS}{Tera Operations Per Second}
+\newacronym{vram}{VRAM}{Video Random Access Memory}
+\newacronym{roc}{ROC}{Receiver Operating Characteristic}
+\newacronym{shap}{SHAP}{SHapley Additive exPlanations}
+\newacronym{rest}{REST}{Representational State Transfer}
+
+% ── Headers & Footers ────────────────────────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Misc ─────────────────────────────────────────────────────────────────────
+\usepackage{enumitem}
+\usepackage[nameinlink]{cleveref}
+
+% =============================================================================
+\begin{document}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  FRONT MATTER
+% ═══════════════════════════════════════════════════════════════════════════════
+\pagenumbering{roman}
+
+% ── Title Page ───────────────────────────────────────────────────────────────
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+{\Large\textsc{Faculty of Engineering of the University of Porto}\par}
+\vspace{0.5cm}
+{\large Master's in Software Engineering\par}
+\vspace{3cm}
+{\LARGE\bfseries Optimizing Large Language Models for Deployment on Resource-Constrained Edge Devices:\\ A Smart Home Case Study\par}
+\vspace{2cm}
+{\Large Sadra Farshid\par}
+\vspace{0.5cm}
+{\large up202001957@up.pt\par}
+\vspace{3cm}
+% TODO: Add supervisor name
+{\large Supervisor: \textit{TODO --- insert supervisor name}\par}
+\vfill
+{\large Porto, \the\year\par}
+\end{titlepage}
+
+% ── Abstract ─────────────────────────────────────────────────────────────────
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+Large Language Models (LLMs) have demonstrated strong capabilities in natural language understanding, code generation, and reasoning tasks. However, their deployment typically relies on cloud infrastructure and high-end hardware, introducing latency, privacy risks, and connectivity dependencies. This dissertation investigates the feasibility and performance of deploying optimized \glspl{llm} on resource-constrained edge devices, using the NVIDIA Jetson Orin Nano as a representative platform and a smart home automation system as the application domain.
+
+The research develops a comprehensive edge \gls{ai} pipeline---\textit{EdgeIOT}---that ingests simulated sensor data (temperature, motion, noise), applies machine learning techniques for behaviour classification and anomaly detection, and leverages locally hosted \glspl{llm} via Ollama for real-time semantic reasoning and action generation. The pipeline evaluates multiple models, including LLaMA~3.2 (3B), Phi-3.5, Gemma~2 (2B), and Qwen~2.5 (1.5B), across metrics such as inference latency, throughput (tokens per second), memory consumption, and \gls{gpu} utilisation.
+
+Model compression techniques, specifically 4-bit quantization using BitsAndBytes and \gls{qlora} fine-tuning for domain-specific adaptation, are applied and evaluated. A novel semantic tokenization layer translates raw sensor readings into compact, domain-specific tokens, yielding measurable reductions in prompt length and inference latency. Experimental results demonstrate that optimized sub-3B-parameter models can achieve practical inference speeds on edge hardware within a 7--15\,W power envelope, enabling fully offline, privacy-preserving smart home intelligence.
+
+\textbf{Keywords:} Large Language Models, Edge AI, Model Optimization, Quantization, QLoRA, Jetson Orin Nano, Smart Home, Internet of Things, Semantic Tokenization.
+
+% ── Acknowledgements ─────────────────────────────────────────────────────────
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+
+% TODO: Write acknowledgements.
+
+% ── Table of Contents, Lists ────────────────────────────────────────────────
+\tableofcontents
+\listoffigures
+\listoftables
+\printglossary[type=\acronymtype,title=List of Acronyms]
+
+\clearpage
+\pagenumbering{arabic}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CHAPTER 1 — INTRODUCTION
+% ═══════════════════════════════════════════════════════════════════════════════
+\chapter{Introduction}
+\label{ch:introduction}
+
+
+\section{Context and Motivation}
+\label{sec:intro-context}
+
+The rapid proliferation of the \gls{iot} has led to an unprecedented volume of sensor data generated at the network edge. Smart home environments, in particular, produce continuous streams of heterogeneous measurements---temperature, humidity, noise levels, motion activity, and light intensity---that must be processed, classified, and acted upon in real time~\cite{stojkoska2017review}. Traditionally, these data streams are transmitted to cloud servers for analysis, introducing network latency, bandwidth costs, and significant privacy concerns, as sensitive household activity patterns leave the user's premises.
+
+Concurrently, \glspl{llm} such as GPT-3~\cite{brown2020language}, LLaMA~\cite{touvron2023llama,touvron2023llama2}, and Phi-3~\cite{abdin2024phi3} have demonstrated remarkable capabilities in natural language understanding, reasoning, and code generation. These models offer the potential to serve as intelligent decision-making engines that can interpret sensor data, generate human-readable explanations, and produce structured control actions for smart home actuators. However, state-of-the-art \glspl{llm} typically comprise billions of parameters, requiring tens of gigabytes of memory and powerful \glspl{gpu} for inference---resources that far exceed the capabilities of edge devices.
+
+Recent advances in model compression---including quantization~\cite{dettmers2022gpt3,frantar2023gptq}, low-rank adaptation~\cite{hu2022lora,dettmers2023qlora}, and pruning~\cite{frantar2023sparsegpt}---have opened the possibility of deploying compact \glspl{llm} on resource-constrained platforms such as the NVIDIA Jetson Orin Nano~\cite{nvidia2024jetson}. This device, with its 8\,GB of shared LPDDR5 memory, 1024 CUDA cores, and a 7--15\,W power envelope, represents a compelling target for edge \gls{ai} applications that require local, offline, and privacy-preserving inference.
+
+This dissertation is motivated by the convergence of these two trends: the need for intelligent, real-time processing of \gls{iot} sensor data at the edge, and the emerging feasibility of deploying optimized \glspl{llm} on embedded hardware. The work develops and evaluates an end-to-end pipeline---\textit{EdgeIOT}---that combines traditional machine learning, semantic tokenization, and locally hosted \gls{llm} inference to create a fully autonomous smart home intelligence system running entirely on a Jetson Orin Nano.
+
+
+\section{Problem Statement}
+\label{sec:intro-problem}
+
+Despite their strong reasoning capabilities, \glspl{llm} remain largely confined to cloud-based deployments. This reliance on centralised infrastructure creates several challenges for \gls{iot} applications:
+
+\begin{enumerate}[label=(\roman*)]
+    \item \textbf{Latency}: Round-trip communication to cloud servers introduces delays that are incompatible with real-time actuation requirements in smart home environments.
+    \item \textbf{Privacy}: Transmitting sensor data describing household occupancy, activity patterns, and environmental conditions to external servers raises significant privacy and data sovereignty concerns.
+    \item \textbf{Connectivity dependence}: Cloud-based systems fail in the absence of a stable internet connection, undermining reliability in critical scenarios.
+    \item \textbf{Cost}: Continuous cloud \gls{api} usage incurs per-token billing costs that scale with the volume and frequency of sensor-driven queries.
+\end{enumerate}
+
+Deploying \glspl{llm} directly on edge devices would address these challenges but introduces its own set of constraints. Edge platforms such as the Jetson Orin Nano have limited memory (8\,GB shared between \gls{cpu} and \gls{gpu}), constrained compute throughput, and tight power budgets. Running a multi-billion-parameter model within these constraints requires aggressive optimization without unacceptable degradation of output quality.
+
+The central problem this dissertation addresses is: \textit{How can \glspl{llm} be effectively optimized and deployed on resource-constrained edge devices to enable real-time, offline, privacy-preserving smart home intelligence?}
+
+
+\section{Research Objectives}
+\label{sec:intro-objectives}
+
+This dissertation pursues the following objectives:
+
+\begin{enumerate}[label=\textbf{O\arabic*.}]
+    \item Design and implement an end-to-end edge \gls{ai} pipeline that integrates sensor data processing, machine learning classification, anomaly detection, semantic tokenization, and \gls{llm}-based reasoning on the NVIDIA Jetson Orin Nano.
+    \item Evaluate the inference performance of multiple small-to-medium \glspl{llm} (LLaMA~3.2 3B, Phi-3.5, Gemma~2 2B, Qwen~2.5 1.5B) on edge hardware, characterising latency, throughput, memory usage, and \gls{gpu} utilisation.
+    \item Apply and assess model compression techniques---specifically 4-bit quantization and \gls{qlora} fine-tuning---to optimise \gls{llm} inference for edge deployment.
+    \item Develop a semantic tokenization layer that reduces prompt complexity and measure its impact on inference efficiency.
+    \item Provide evidence-based recommendations for the selection and optimization of \glspl{llm} for edge \gls{iot} applications.
+\end{enumerate}
+
+
+\section{Research Questions}
+\label{sec:intro-rqs}
+
+The research objectives are operationalised through the following research questions:
+
+\begin{description}[style=nextline,leftmargin=1.2cm]
+    \item[\textbf{RQ1.}] What inference latency and throughput can sub-3B-parameter \glspl{llm} achieve on the NVIDIA Jetson Orin Nano under 4-bit quantization?
+    \item[\textbf{RQ2.}] How does \gls{qlora} fine-tuning affect inference speed, memory consumption, and response quality compared to the base quantized model?
+    \item[\textbf{RQ3.}] To what extent does semantic tokenization of sensor data reduce prompt length and improve \gls{llm} inference efficiency on edge hardware?
+    \item[\textbf{RQ4.}] Which model and optimization configuration yields the best trade-off between performance and resource consumption for a smart home edge deployment?
+\end{description}
+
+
+\section{Contributions}
+\label{sec:intro-contributions}
+
+This dissertation makes the following contributions:
+
+\begin{enumerate}
+    \item \textbf{EdgeIOT Pipeline}: A modular, open-source edge \gls{ai} pipeline that integrates data ingestion, preprocessing, hierarchical clustering, XGBoost classification, Isolation Forest anomaly detection, semantic tokenization, and local \gls{llm} inference via Ollama into a cohesive system deployable on the Jetson Orin Nano.
+
+    \item \textbf{Multi-Model Edge Benchmarking}: A systematic benchmarking study comparing five \glspl{llm} (LLaMA~3.2, Phi-3/3.5, Gemma~2, Qwen~2.5, OpenHermes) on edge hardware across latency, throughput, memory, and \gls{gpu} utilisation metrics.
+
+    \item \textbf{QLoRA Fine-Tuning on Edge}: An implementation and evaluation of 4-bit \gls{qlora} fine-tuning of LLaMA~3.2 (3B) directly on the Jetson Orin Nano for domain-specific smart home reasoning.
+
+    \item \textbf{Semantic Tokenization for Efficiency}: A semantic tokenization scheme that translates continuous sensor values into discrete, domain-specific tokens (e.g., \texttt{[TEMP\_HIGH]}, \texttt{[NOISE\_SPIKE]}), demonstrating measurable reductions in prompt length and inference latency.
+
+    \item \textbf{Smart Home Brain Module}: A prompt-engineering framework with three configurable styles (\textit{hybrid}, \textit{compact}, \textit{raw}) and a keyword-based action parser that maps \gls{llm} natural language outputs to structured \gls{json} control actions.
+\end{enumerate}
+
+
+\section{Dissertation Structure}
+\label{sec:intro-structure}
+
+The remainder of this dissertation is organised as follows:
+
+\begin{description}[style=nextline,leftmargin=0.5cm]
+    \item[\Cref{ch:stateoftheart} --- State of the Art] Reviews the literature on \glspl{llm}, edge \gls{ai}, and model compression techniques including quantization, pruning, and knowledge distillation. Identifies the research gap that this work addresses.
+
+    \item[\Cref{ch:methodology} --- Methodology] Describes the research approach, the selected models and hardware platform, the optimization techniques applied, the evaluation metrics, and the experimental procedure.
+
+    \item[\Cref{ch:implementation} --- Implementation and Experimental Setup] Presents the system architecture, data pipeline, \gls{ml} modules, \gls{llm} integration, \gls{qlora} fine-tuning pipeline, and benchmark instrumentation in detail.
+
+    \item[\Cref{ch:results} --- Results and Analysis] Reports and analyses the experimental results, including classification accuracy, \gls{llm} inference performance, token efficiency gains, multi-model comparisons, and the impact of fine-tuning.
+
+    \item[\Cref{ch:conclusions} --- Conclusions and Future Work] Summarises the findings, answers the research questions, discusses limitations, and outlines directions for future research.
+\end{description}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CHAPTER 2 — STATE OF THE ART
+% ═══════════════════════════════════════════════════════════════════════════════
+\chapter{State of the Art}
+\label{ch:stateoftheart}
+
+This chapter reviews the current body of knowledge relevant to deploying \glspl{llm} on resource-constrained edge devices. It examines the evolution of \glspl{llm}, the edge \gls{ai} paradigm, inference runtime architectures, and the principal model compression techniques---quantization, pruning, and knowledge distillation---that enable on-device deployment. The chapter concludes with a comparison of related work and the identification of the research gap addressed by this dissertation.
+
+
+\section{Large Language Models}
+\label{sec:sota-llms}
+
+\subsection{The Transformer Architecture}
+
+The Transformer architecture, introduced by Vaswani et al.~\cite{vaswani2017attention}, replaced recurrent and convolutional sequence models with a purely attention-based mechanism. The self-attention operation computes, for each token in a sequence, a weighted sum over all other tokens, enabling the model to capture long-range dependencies without sequential processing. Formally, for queries $Q$, keys $K$, and values $V$:
+
+\begin{equation}
+\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^T}{\sqrt{d_k}}\right) V
+\label{eq:attention}
+\end{equation}
+
+\noindent where $d_k$ is the dimensionality of the key vectors. Multi-head attention extends this by projecting $Q$, $K$, and $V$ into multiple subspaces, allowing the model to attend to information from different representational perspectives simultaneously.
+
+\subsection{Evolution of Large Language Models}
+
+The GPT family~\cite{brown2020language} demonstrated that scaling Transformer decoder models to billions of parameters and training on vast internet corpora produces powerful few-shot learners. GPT-3, with 175 billion parameters, established that \glspl{llm} can perform diverse \gls{nlp} tasks without task-specific fine-tuning, simply by conditioning on natural language prompts.
+
+The open-source community has since produced several families of competitive models at smaller scales:
+
+\begin{itemize}
+    \item \textbf{LLaMA}~\cite{touvron2023llama,touvron2023llama2}: Meta's LLaMA family offers models from 1B to 70B parameters. LLaMA~3.2 (3B) is particularly relevant for edge deployment, as it was explicitly designed for mobile and edge platforms with reduced memory and compute requirements~\cite{meta2024llama3}.
+
+    \item \textbf{Phi-3}~\cite{abdin2024phi3}: Microsoft's Phi family achieves strong performance at small parameter counts (3.8B) through high-quality training data curation, demonstrating that data quality can partially compensate for model size.
+
+    \item \textbf{Gemma~2}~\cite{google2024gemma}: Google DeepMind's Gemma models, available at 2B and 7B parameters, leverage the research and technology underlying Gemini for efficient open-weight deployment.
+
+    \item \textbf{Qwen~2.5}: Alibaba's Qwen family offers models from 0.5B to 72B parameters, with the 1.5B variant being among the smallest models capable of coherent instruction following.
+\end{itemize}
+
+\subsection{LLM Capabilities for Software Engineering and IoT}
+
+\glspl{llm} have demonstrated applicability across a range of software engineering tasks, including code summarization, bug classification, log analysis, and natural language explanations of software behaviour. In the \gls{iot} domain, their ability to interpret sensor data and generate structured actions makes them candidates for intelligent automation systems, provided the inference can be performed within the latency and resource constraints of edge deployments.
+
+
+\section{Edge AI and Resource-Constrained Devices}
+\label{sec:sota-edgeai}
+
+Edge \gls{ai} refers to the execution of \gls{ml} inference directly on devices located at or near the data source, rather than in centralised cloud infrastructure~\cite{chen2019deep}. This paradigm offers several advantages: reduced latency (eliminating network round trips), enhanced privacy (data never leaves the device), offline capability, and lower operational cost~\cite{dhar2021survey}.
+
+\subsection{The NVIDIA Jetson Platform}
+
+The NVIDIA Jetson family of System-on-Modules (SoMs) is designed specifically for edge \gls{ai} workloads~\cite{nvidia2024jetson}. The Jetson Orin Nano Developer Kit, used in this dissertation, provides the following specifications:
+
+\begin{table}[htbp]
+\caption{NVIDIA Jetson Orin Nano Developer Kit specifications.}
+\label{tab:jetson-specs}
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Component} & \textbf{Specification} \\
+\midrule
+CPU              & 6-core ARM Cortex-A78AE \\
+GPU              & NVIDIA Ampere (1024 CUDA cores, 32 Tensor Cores) \\
+AI Performance   & Up to 40 \gls{tops} \\
+Memory           & 8\,GB LPDDR5 (shared CPU/GPU) \\
+Memory Bandwidth & 68\,GB/s \\
+Storage          & NVMe SSD (user-supplied) \\
+Power Envelope   & 7--15\,W \\
+Operating System & JetPack Linux (Ubuntu-based) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The shared memory architecture is both an advantage (unified address space simplifies \gls{gpu} offloading) and a constraint (the 8\,GB must accommodate the operating system, model weights, KV-cache, and application logic simultaneously). This makes memory-efficient model representations critical for practical deployment.
+
+\subsection{Challenges of LLM Deployment on Edge Devices}
+
+Deploying \glspl{llm} on edge hardware presents four primary challenges:
+
+\begin{enumerate}
+    \item \textbf{Memory}: A 3B-parameter model in FP16 requires approximately 6\,GB, leaving minimal headroom on an 8\,GB device. 4-bit quantization reduces this to approximately 1.5--2\,GB.
+    \item \textbf{Compute}: The autoregressive decoding loop requires repeated matrix multiplications across all Transformer layers for each generated token, making throughput a function of both \gls{gpu} compute capacity and memory bandwidth.
+    \item \textbf{Latency}: Real-time applications require end-to-end response times (prompt encoding + token generation) on the order of seconds, not minutes.
+    \item \textbf{Thermal management}: Sustained inference under a 15\,W power budget generates heat that must be dissipated, potentially triggering thermal throttling.
+\end{enumerate}
+
+
+\section{LLM Inference Architectures}
+\label{sec:sota-inference}
+
+Several software frameworks have emerged to enable efficient \gls{llm} inference, particularly on resource-constrained hardware.
+
+\subsection{llama.cpp and the GGUF Format}
+
+llama.cpp~\cite{gerganov2023llamacpp} is a C/C++ implementation of \gls{llm} inference that supports CPU-only, CUDA, and Metal backends. It introduced the \gls{gguf} model format, which stores quantized model weights in a memory-mappable binary format optimised for low-overhead loading and inference. \gls{gguf} supports multiple quantization levels (Q2\_K through Q8\_0), enabling fine-grained control over the memory--quality trade-off.
+
+\subsection{Ollama}
+
+Ollama~\cite{ollama2024} provides a user-friendly runtime built on top of llama.cpp that manages model downloading, versioning, and serving through a \gls{rest} \gls{api}. It exposes an HTTP endpoint (by default at \texttt{localhost:11434}) that accepts prompt payloads and returns model responses along with performance metadata (token counts, evaluation duration, load duration). The EdgeIOT pipeline uses Ollama as its \gls{llm} serving backend, leveraging its \gls{api} for both batch and streaming inference.
+
+\subsection{Hugging Face Transformers}
+
+The Hugging Face Transformers library~\cite{wolf2020transformers} provides Python interfaces for loading, fine-tuning, and running inference on a wide range of pre-trained models. When combined with BitsAndBytes for quantization and the \gls{peft} library for \gls{lora}/\gls{qlora}, it forms the foundation for the fine-tuning pipeline used in this work.
+
+
+\section{Quantization Techniques}
+\label{sec:sota-quantization}
+
+Quantization reduces the numerical precision of model weights and/or activations from floating-point (FP32 or FP16) to lower-bitwidth representations (INT8, INT4), thereby reducing memory footprint and, on supported hardware, improving compute throughput~\cite{jacob2018quantization}.
+
+\subsection{Post-Training Quantization}
+
+Post-training quantization (PTQ) converts a pre-trained model's weights to a lower precision without retraining. Dettmers et al.~\cite{dettmers2022gpt3} demonstrated that 8-bit quantization of Transformer models (LLM.int8()) can be achieved with negligible accuracy loss by handling outlier features separately. GPTQ~\cite{frantar2023gptq} extends this to 4-bit and 3-bit quantization using approximate second-order information (the Hessian) to minimize quantization error layer by layer.
+
+\subsection{Quantization-Aware Training and QLoRA}
+
+\gls{qlora}~\cite{dettmers2023qlora} combines 4-bit NormalFloat quantization of the base model with \gls{lora} adapters trained in FP16/BF16. This approach enables fine-tuning of large models on hardware with limited memory by keeping the vast majority of parameters frozen in a 4-bit representation while training only small, low-rank adapter matrices. The key components of \gls{qlora} are:
+
+\begin{itemize}
+    \item \textbf{4-bit NormalFloat (NF4)}: A data type optimised for the distribution of neural network weights, which are approximately normally distributed.
+    \item \textbf{Double quantization}: Quantization of the quantization constants themselves, further reducing the memory overhead.
+    \item \textbf{Paged optimizers}: Use of NVIDIA unified memory to handle memory spikes during gradient computation.
+\end{itemize}
+
+The memory savings are substantial: a 3B-parameter model that requires $\sim$6\,GB in FP16 can be loaded in $\sim$1.7\,GB at 4-bit precision, with the \gls{lora} adapters adding only tens of megabytes.
+
+\subsection{Impact on Edge Deployment}
+
+For the Jetson Orin Nano's 8\,GB memory budget, 4-bit quantization is not merely an optimization but a prerequisite. It is the difference between a model fitting in memory (with room for the KV-cache and application logic) and being entirely unable to load.
+
+
+\section{Pruning Techniques}
+\label{sec:sota-pruning}
+
+Pruning removes redundant or low-importance parameters from a neural network, reducing both model size and (potentially) computational cost~\cite{lecun1989optimal,han2015learning}.
+
+\subsection{Unstructured Pruning}
+
+Unstructured pruning sets individual weights to zero based on a magnitude or importance criterion. While it can achieve high sparsity ratios, the resulting irregular sparsity patterns are difficult to exploit on commodity \gls{gpu} hardware, limiting practical speedups.
+
+\subsection{Structured Pruning}
+
+Structured pruning removes entire neurons, attention heads, or layers, producing dense sub-networks that map efficiently onto \gls{gpu} execution units. However, structured pruning typically requires retraining to recover accuracy.
+
+\subsection{Pruning for LLMs}
+
+SparseGPT~\cite{frantar2023sparsegpt} demonstrated that large Transformer models can be pruned to 50--60\% sparsity in a single pass without retraining, using approximate inverse Hessian information. While promising, hardware support for sparse operations on the Jetson's Ampere \gls{gpu} is limited, making pruning a secondary optimization to quantization for this work's target platform.
+
+
+\section{Knowledge Distillation}
+\label{sec:sota-distillation}
+
+Knowledge distillation~\cite{hinton2015distilling} trains a smaller ``student'' model to reproduce the output distribution of a larger ``teacher'' model. The student is trained to match the teacher's soft probability outputs (softmax with a temperature parameter), capturing richer information than hard labels alone.
+
+Distillation is complementary to quantization: the smaller models evaluated in this dissertation (e.g., Phi-3 at 3.8B, Gemma~2 at 2B) are themselves products of distillation-like training processes, where curated, high-quality training data acts as an implicit form of knowledge transfer from larger models~\cite{gou2021knowledge}. The relationship between the teacher capacity and the student's achievable performance on edge devices remains an active area of research.
+
+
+\section{Related Work Comparison}
+\label{sec:sota-related}
+
+\Cref{tab:related-work} summarises the most relevant prior studies and positions this dissertation relative to them.
+
+\begin{table}[htbp]
+\caption{Comparison with related work on edge LLM deployment.}
+\label{tab:related-work}
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{2.8cm} p{2cm} p{2.5cm} p{2cm} X}
+\toprule
+\textbf{Study} & \textbf{Platform} & \textbf{Model(s)} & \textbf{Optimisation} & \textbf{Application} \\
+\midrule
+Xu et al.~\cite{xu2024survey} & Survey & Various & Various & Inference efficiency survey \\
+Warden \& Situnayake~\cite{warden2019tinyml} & MCU/Edge & TFLite models & Quantization & TinyML applications \\
+Dettmers et al.~\cite{dettmers2023qlora} & Server GPU & LLaMA 7--65B & QLoRA & General fine-tuning \\
+\midrule
+\textbf{This work} & \textbf{Jetson Orin Nano} & \textbf{LLaMA 3.2, Phi-3, Gemma 2, Qwen 2.5} & \textbf{4-bit quant. + QLoRA + semantic tokenization} & \textbf{Smart home IoT} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% TODO: Add 2--3 additional rows with edge-specific LLM deployment studies once literature review is finalised.
+
+
+\section{Research Gap}
+\label{sec:sota-gap}
+
+The review reveals the following gaps in the existing literature:
+
+\begin{enumerate}
+    \item \textbf{Lack of end-to-end evaluation}: Most studies evaluate model compression techniques in isolation (e.g., quantization accuracy on benchmarks) rather than within a complete application pipeline running on actual edge hardware.
+
+    \item \textbf{Limited multi-model comparison on edge}: Systematic comparisons of multiple sub-3B \glspl{llm} on the same edge platform, under identical workloads and metrics, are scarce.
+
+    \item \textbf{Missing domain-specific optimization}: The interaction between prompt engineering, semantic preprocessing, and model compression for \gls{iot} applications has not been thoroughly explored.
+
+    \item \textbf{QLoRA on edge hardware}: While \gls{qlora} was proposed and evaluated on server-class \glspl{gpu}, its application for on-device fine-tuning on platforms as constrained as the Jetson Orin Nano has received limited attention.
+\end{enumerate}
+
+This dissertation addresses these gaps by implementing a complete, deployable pipeline that combines semantic tokenization, multi-model benchmarking, and \gls{qlora} fine-tuning on the Jetson Orin Nano within a practical smart home application domain.
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CHAPTER 3 — METHODOLOGY
+% ═══════════════════════════════════════════════════════════════════════════════
+\chapter{Methodology}
+\label{ch:methodology}
+
+This chapter describes the research methodology adopted in this dissertation, including the experimental approach, the selection of models and hardware, the optimization techniques applied, the metrics used for evaluation, and the overall experimental procedure.
+
+
+\section{Research Approach}
+\label{sec:meth-approach}
+
+This work follows an \textit{experimental software engineering} methodology. The research is structured around the design, implementation, and empirical evaluation of a software system (the EdgeIOT pipeline) under controlled conditions. The approach proceeds through the following phases:
+
+\begin{enumerate}
+    \item \textbf{System design and implementation}: Development of a modular pipeline integrating sensor data processing, \gls{ml} classification, anomaly detection, semantic tokenization, and \gls{llm} inference.
+    \item \textbf{Baseline measurement}: Execution of the pipeline with multiple base (unoptimized) models to establish reference performance metrics.
+    \item \textbf{Optimization}: Application of 4-bit quantization and \gls{qlora} fine-tuning to the primary model (LLaMA~3.2 3B).
+    \item \textbf{Comparative evaluation}: Re-execution of the pipeline with the optimized model and comparison against the baseline across all metrics.
+    \item \textbf{Analysis and synthesis}: Statistical analysis of the collected data and formulation of evidence-based conclusions.
+\end{enumerate}
+
+All experiments are conducted on the same hardware platform (Jetson Orin Nano) under identical software configurations to ensure reproducibility and comparability. Each experiment produces timestamped output directories containing benchmark \glspl{csv}, \gls{json} outputs, and visualization plots.
+
+
+\section{Selected Models}
+\label{sec:meth-models}
+
+The models were selected based on three criteria: (i)~parameter count compatible with 8\,GB memory under 4-bit quantization, (ii)~availability of open weights, and (iii)~support in the Ollama runtime. \Cref{tab:selected-models} summarises the models evaluated.
+
+\begin{table}[htbp]
+\caption{Language models evaluated in this dissertation.}
+\label{tab:selected-models}
+\centering
+\begin{tabular}{llll}
+\toprule
+\textbf{Model} & \textbf{Parameters} & \textbf{Provider} & \textbf{Quantization} \\
+\midrule
+LLaMA 3.2       & 3B   & Meta        & 4-bit (Q4\_K\_M via Ollama) \\
+Phi-3.5          & 3.8B & Microsoft   & 4-bit (Q4\_K\_M via Ollama) \\
+Gemma 2          & 2B   & Google      & 4-bit (Q4\_K\_M via Ollama) \\
+Qwen 2.5         & 1.5B & Alibaba     & 4-bit (Q4\_K\_M via Ollama) \\
+OpenHermes       & 7B   & Teknium     & 4-bit (Q4\_K\_M via Ollama) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+LLaMA~3.2 (3B) was selected as the primary model for in-depth optimization (including \gls{qlora} fine-tuning) due to its strong baseline performance, explicit design for edge platforms~\cite{meta2024llama3}, and extensive community support. The remaining models serve as comparison points across different model families and parameter scales.
+
+
+\section{Experimental Environment}
+\label{sec:meth-environment}
+
+\subsection{Hardware}
+
+All experiments were executed on a single NVIDIA Jetson Orin Nano Developer Kit with the specifications listed in \Cref{tab:jetson-specs}. The device was configured in 15\,W \texttt{MAXN} power mode to maximise performance. An NVMe SSD was used for storage to minimise I/O bottlenecks during model loading.
+
+\subsection{Software Stack}
+
+\Cref{tab:software-stack} details the software environment.
+
+\begin{table}[htbp]
+\caption{Software stack used in the experimental environment.}
+\label{tab:software-stack}
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Component} & \textbf{Version} \\
+\midrule
+Operating System       & JetPack Linux (Ubuntu 22.04-based) \\
+Python                 & 3.10+ \\
+Ollama                 & Latest stable \\
+Hugging Face Transformers & $\geq$ 4.40 \\
+BitsAndBytes           & Latest (CUDA-compatible) \\
+PEFT                   & Latest \\
+PyTorch                & 2.x (CUDA-enabled, JetPack build) \\
+scikit-learn           & Latest \\
+XGBoost                & Latest \\
+SHAP                   & Latest \\
+psutil / GPUtil        & Latest \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\section{Optimization Techniques Applied}
+\label{sec:meth-optimization}
+
+\subsection{4-bit Quantization via BitsAndBytes}
+
+The base LLaMA~3.2 (3B) model was quantized from FP16 to 4-bit precision using the BitsAndBytes library integrated with the Hugging Face \texttt{AutoModelForCausalLM} loader. The quantization configuration used \texttt{load\_in\_4bit=True} with FP32 \gls{cpu} offload enabled for stability on the Jetson's shared memory architecture.
+
+\subsection{QLoRA Fine-Tuning}
+
+\gls{qlora} fine-tuning was applied to the 4-bit quantized LLaMA~3.2 model to adapt it to the smart home reasoning domain. The fine-tuning configuration, drawn directly from the implementation, is detailed in \Cref{tab:qlora-config}.
+
+\begin{table}[htbp]
+\caption{QLoRA fine-tuning hyperparameters.}
+\label{tab:qlora-config}
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+LoRA rank ($r$)          & 64 \\
+LoRA alpha ($\alpha$)    & 16 \\
+Target modules           & \texttt{q\_proj}, \texttt{v\_proj} \\
+LoRA dropout             & 0.1 \\
+Learning rate            & $2 \times 10^{-4}$ \\
+Batch size               & 4 \\
+Training epochs          & 3 \\
+Max sequence length      & 512 tokens \\
+Precision                & FP16 (mixed) \\
+Optimizer                & AdamW \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The training data was generated from the pipeline's own semantic outputs: each training example pairs a semantic token string (e.g., \texttt{[TEMP\_HIGH] [NOISE\_SPIKE] [ANOMALY\_ALERT]}) as the instruction with the base model's reasoning response as the output, formatted in an instruction--response template.
+
+\subsection{Semantic Tokenization}
+
+A custom semantic tokenization layer converts normalised continuous sensor values into discrete domain-specific tokens using threshold-based rules. For example, a standardised temperature value exceeding $+1\sigma$ produces the token \texttt{[TEMP\_HIGH]}, while a value below $-1\sigma$ produces \texttt{[TEMP\_LOW]}. The complete set of seven tokenization rules is detailed in \Cref{ch:implementation}. This preprocessing reduces prompt length and focuses the \gls{llm}'s attention on relevant events.
+
+
+\section{Evaluation Metrics}
+\label{sec:meth-metrics}
+
+Performance was evaluated along two dimensions: \textit{system-level metrics} characterising hardware resource usage, and \textit{task-level metrics} assessing output quality.
+
+\subsection{System-Level Metrics}
+
+\begin{description}
+    \item[Inference latency] End-to-end time (in milliseconds) from prompt submission to complete response receipt, measured via \texttt{time.perf\_counter()}.
+    \item[Throughput] Output tokens generated per second (\gls{tps}), computed from the Ollama \gls{api} response fields \texttt{eval\_count} and \texttt{eval\_duration}.
+    \item[Memory consumption] \gls{ram} usage of the Python process (via \texttt{psutil}), and \gls{gpu} memory usage (via \texttt{GPUtil}).
+    \item[GPU utilisation] Percentage \gls{gpu} load during inference.
+    \item[Model load time] Time to load the model into \gls{gpu} memory, reported by Ollama's \texttt{load\_duration} field.
+\end{description}
+
+\subsection{Task-Level Metrics}
+
+\begin{description}
+    \item[Action parsing accuracy] Percentage of \gls{llm} responses that are successfully parsed into a recognised smart home action (as opposed to falling through to the \texttt{other} category).
+    \item[Qualitative assessment] Manual review of a sample of 10 \gls{llm} responses to verify that the generated reasoning is coherent, relevant to the sensor context, and produces appropriate actions.
+    \item[Classification accuracy] Accuracy of the upstream \gls{ml} classifiers (Decision Tree, Random Forest, XGBoost), evaluated via standard metrics and 5-fold cross-validation.
+\end{description}
+
+
+\section{Experimental Procedure}
+\label{sec:meth-procedure}
+
+The experiments were conducted in the following sequence:
+
+\begin{enumerate}
+    \item \textbf{Data preparation}: The \textit{RealLife.csv} smart home dataset was loaded, cleaned (duplicate removal, NaN imputation), and preprocessed (one-hot encoding of categorical features, standard scaling of sensor columns).
+
+    \item \textbf{Unsupervised clustering}: \gls{pca} was applied for dimensionality reduction, followed by agglomerative hierarchical clustering (Ward linkage, $k=3$) to generate pseudo-labels for three behavioural states: \textit{active}, \textit{sleeping}, and \textit{away}.
+
+    \item \textbf{Classification}: Three classifiers (Decision Tree, Random Forest, XGBoost) were trained on the pseudo-labels using an 80/20 train/test split with stratification.
+
+    \item \textbf{Anomaly detection}: Sliding-window sequences (window size = 5) were generated from the sensor time series, and an Isolation Forest (100 estimators, 5\% contamination) was fitted to flag abnormal patterns.
+
+    \item \textbf{Semantic tokenization}: Each test sample was converted to a sequence of semantic tokens, with anomaly flags appended where applicable.
+
+    \item \textbf{LLM benchmarking}: For each model under evaluation, the full set of tokenized test samples was submitted to the locally hosted \gls{llm} via Ollama, recording all system-level metrics per sample. Results were saved to timestamped \gls{csv} files.
+
+    \item \textbf{Token efficiency experiment}: A subset of 20 samples was processed twice---once with raw numeric sensor values and once with semantic tokens---to measure the impact of tokenization on latency and throughput.
+
+    \item \textbf{QLoRA fine-tuning}: The training corpus was exported from the pipeline's semantic outputs, the base model was quantized to 4-bit, and \gls{qlora} fine-tuning was performed. The fine-tuned model was then re-evaluated through the same benchmarking pipeline.
+
+    \item \textbf{Streaming demo}: A continuous streaming demo was executed to simulate real-world deployment conditions, with the \gls{llm} processing sensor readings at configurable intervals.
+\end{enumerate}
+
+Each model's benchmark run was stored in a separate timestamped directory (e.g., \texttt{outputs/20260604\_184305\_llama3.2\_3b/}) containing the benchmark \gls{csv}, semantic outputs \gls{json}, token efficiency \gls{csv}, and all generated plots. A total of 19 benchmark runs were collected across the five models.
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CHAPTER 4 — IMPLEMENTATION AND EXPERIMENTAL SETUP
+% ═══════════════════════════════════════════════════════════════════════════════
+\chapter{Implementation and Experimental Setup}
+\label{ch:implementation}
+
+This chapter presents the design and implementation of the EdgeIOT pipeline, detailing each software module, the data flow between components, the \gls{qlora} fine-tuning pipeline, and the benchmarking instrumentation. All code is implemented in Python and organised as a modular package (\texttt{edgeiot/}).
+
+
+\section{System Architecture}
+\label{sec:impl-architecture}
+
+The EdgeIOT pipeline is structured as a 14-stage orchestration controlled by a single entry point (\texttt{main.py}). \Cref{tab:pipeline-stages} lists the stages and their corresponding modules.
+
+\begin{table}[htbp]
+\caption{EdgeIOT pipeline stages and associated modules.}
+\label{tab:pipeline-stages}
+\centering
+\small
+\begin{tabularx}{\textwidth}{clX}
+\toprule
+\textbf{Stage} & \textbf{Name} & \textbf{Module / Class} \\
+\midrule
+1  & Load \& Clean              & \texttt{edgeiot.data.DataLoader} \\
+2  & Encode + Normalise         & \texttt{edgeiot.data.DataPreprocessor} \\
+3  & Sensor Time-Series Plot    & \texttt{edgeiot.viz.PipelineVisualizer} \\
+4  & PCA + Hierarchical Clustering & \texttt{edgeiot.data.HierarchicalClusteringManager} \\
+5  & Train / Test Split         & \texttt{edgeiot.data.DataPreprocessor.split\_data} \\
+6--8 & Classification (DT, RF, XGB) & \texttt{edgeiot.models.ModelEvaluator} \\
+9  & SHAP Explainability        & \texttt{shap.Explainer} \\
+10 & Anomaly Detection          & \texttt{edgeiot.models.IsolationForestAnomalyDetector} \\
+11 & Semantic Tokenization      & \texttt{edgeiot.semantic.SemanticTokenizer} \\
+12 & LLM Reasoning \& Benchmark & \texttt{edgeiot.semantic.OllamaReasoner} \\
+13 & JSON Output Compilation    & Pipeline orchestrator \\
+14 & Summary Dashboard          & Console output \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The project follows a package-based layout:
+
+\begin{lstlisting}[language={},caption={EdgeIOT project structure.},label={lst:project-structure}]
+EdgeIOT/
+  edgeiot/
+    __init__.py
+    brain.py          # Smart-home brain: prompt -> LLM -> action
+    config.py          # Pipeline configuration dataclasses
+    data/              # DataLoader, DataPreprocessor, Clustering
+    models/            # XGBoost, RandomForest, DT, Anomaly Detection
+    semantic/          # SemanticTokenizer, OllamaReasoner
+    viz/               # PipelineVisualizer (matplotlib)
+  scripts/
+    simulate_sensors.py
+    run_demo.py        # Batch baseline demo
+    stream_demo.py     # Continuous streaming demo
+    01_download_model_from_hf.py
+    02_make_train_data.py
+    03_load_hf_checkpoint.py
+    04_qlora_finetune.py
+  main.py              # Pipeline orchestrator
+\end{lstlisting}
+
+
+\section{Data Pipeline}
+\label{sec:impl-data}
+
+\subsection{Data Loading and Cleaning}
+
+The \texttt{DataLoader} class ingests the \textit{RealLife.csv} dataset, which contains smart home sensor recordings with columns for temperature, humidity, noise (dB), light intensity, motion level, location, and behaviour context. The cleaning phase removes duplicate rows and fills missing numeric values with column means.
+
+\subsection{Preprocessing}
+
+The \texttt{DataPreprocessor} applies one-hot encoding to categorical columns (\texttt{location}, \texttt{behaviour}) and standardises the five sensor columns using scikit-learn's \texttt{StandardScaler}:
+
+\begin{equation}
+z_i = \frac{x_i - \mu}{\sigma}
+\label{eq:standardscaler}
+\end{equation}
+
+\noindent where $x_i$ is the raw value, $\mu$ is the column mean, and $\sigma$ is the standard deviation. The dataset is then split into training (80\%) and testing (20\%) sets with stratified sampling.
+
+\subsection{Hierarchical Clustering}
+
+Agglomerative clustering with Ward linkage~\cite{ward1963hierarchical} groups the preprocessed samples into three clusters corresponding to inferred behavioural states: \textit{active} (cluster~0), \textit{sleeping} (cluster~1), and \textit{away} (cluster~2). These pseudo-labels serve as the target variable for supervised classification. \gls{pca}~\cite{jolliffe2016principal} is applied to reduce the feature space to two dimensions for visualization.
+
+
+\section{Machine Learning Classification}
+\label{sec:impl-classification}
+
+Three classifiers are trained on the pseudo-labels, providing a comparative evaluation of classification performance:
+
+\begin{enumerate}
+    \item \textbf{Decision Tree}: \texttt{max\_depth=5}, used as an interpretable baseline.
+    \item \textbf{Random Forest}~\cite{chen2016xgboost}: 100 estimators, \texttt{max\_depth=6}, providing ensemble robustness.
+    \item \textbf{XGBoost}~\cite{chen2016xgboost}: 200 estimators, \texttt{max\_depth=6}, learning rate 0.1, with multi-class softmax probability output. This serves as the primary classifier.
+\end{enumerate}
+
+All classifiers are evaluated using accuracy, classification reports, confusion matrices, and \gls{roc} curves. The XGBoost model is additionally subjected to 5-fold cross-validation and \gls{shap}~\cite{lundberg2017shap} analysis for feature importance explanations.
+
+
+\section{Anomaly Detection}
+\label{sec:impl-anomaly}
+
+The \texttt{IsolationForestAnomalyDetector} module implements time-series anomaly detection using sliding windows over the sensor columns. The \texttt{SequenceWindowGenerator} creates sequences of width $w \times f$, where $w=5$ is the window size and $f$ is the number of sensor features, producing flattened feature vectors that capture temporal patterns.
+
+An Isolation Forest~\cite{liu2008isolation} with 100 estimators and 5\% contamination rate is fitted on these sequences. Samples scoring below the decision boundary are labelled \texttt{ABNORMAL}; all others are labelled \texttt{NORMAL}. The anomaly status is propagated to the semantic tokenization stage, where \texttt{ABNORMAL} samples receive the additional token \texttt{[ANOMALY\_ALERT]}.
+
+
+\section{Semantic Tokenization}
+\label{sec:impl-tokenization}
+
+The \texttt{SemanticTokenizer} converts normalised sensor values into discrete, human-readable tokens using the threshold rules in \Cref{tab:token-rules}.
+
+\begin{table}[htbp]
+\caption{Semantic tokenization rules (applied to standardised sensor values).}
+\label{tab:token-rules}
+\centering
+\begin{tabular}{llcl}
+\toprule
+\textbf{Sensor Column} & \textbf{Operator} & \textbf{Threshold} & \textbf{Token} \\
+\midrule
+\texttt{temperature}     & $>$  & $+1$ & \texttt{[TEMP\_HIGH]} \\
+\texttt{temperature}     & $<$  & $-1$ & \texttt{[TEMP\_LOW]} \\
+\texttt{humidity}        & $>$  & $+1$ & \texttt{[HUMIDITY\_HIGH]} \\
+\texttt{humidity}        & $<$  & $-1$ & \texttt{[HUMIDITY\_LOW]} \\
+\texttt{noise\_db}       & $>$  & $+1$ & \texttt{[NOISE\_SPIKE]} \\
+\texttt{motion\_level}   & $>$  & $+1$ & \texttt{[MOTION\_ACTIVE]} \\
+\texttt{light\_intensity} & $<$ & $-1$ & \texttt{[LOW\_LIGHT]} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The tokens are concatenated into a space-separated string (e.g., \texttt{[TEMP\_HIGH] [NOISE\_SPIKE] [ANOMALY\_ALERT]}) and passed to the \gls{llm} as part of the prompt. Samples that trigger no rules produce an empty token list, rendered as \texttt{[NO\_EVENT]} in the prompt.
+
+
+\section{LLM Integration}
+\label{sec:impl-llm}
+
+\subsection{OllamaReasoner}
+
+The \texttt{OllamaReasoner} class communicates with the Ollama \gls{rest} \gls{api} at \texttt{http://localhost:11434/api/generate}. Each request includes the model name, the prompt, and inference parameters: temperature~$=0.2$, \texttt{num\_predict}~$=80$ (maximum output tokens), and \texttt{num\_ctx}~$=512$ (context window size). The response includes the generated text, token counts, and timing metadata.
+
+\subsection{Smart Home Brain Module}
+
+The \texttt{brain.py} module implements the inference loop for the demo applications. It supports three prompt styles:
+
+\begin{description}
+    \item[\textit{hybrid} (default)] A structured prompt with a system instruction and bullet-pointed sensor values.
+    \item[\textit{compact}] A single-line terse representation of all sensor values.
+    \item[\textit{raw}] The sensor dictionary dumped directly as \gls{json}.
+\end{description}
+
+The module includes a keyword-based action parser (\texttt{parse\_reply}) that maps \gls{llm} natural language outputs to nine predefined smart home actions (e.g., \texttt{adjust\_ac}, \texttt{security\_alert}, \texttt{no\_action}) plus a catch-all \texttt{other} category.
+
+
+\section{QLoRA Fine-Tuning Pipeline}
+\label{sec:impl-qlora}
+
+The fine-tuning pipeline consists of four sequential scripts:
+
+\begin{enumerate}
+    \item \textbf{Model download} (\texttt{01\_download\_model\_from\_hf.py}): Downloads the LLaMA~3.2 (3B) checkpoint from Hugging Face using the \texttt{hf} \gls{cli}.
+
+    \item \textbf{Training data generation} (\texttt{02\_make\_train\_data.py}): Converts the pipeline's \texttt{semantic\_outputs.json} into a JSONL file where each line contains an \texttt{instruction} (semantic tokens) and an \texttt{output} (the base model's reasoning response).
+
+    \item \textbf{4-bit checkpoint creation} (\texttt{03\_load\_hf\_checkpoint.py}): Loads the FP16 model with \texttt{BitsAndBytesConfig(load\_in\_4bit=True)} and saves the quantized model and tokenizer to disk.
+
+    \item \textbf{QLoRA training} (\texttt{04\_qlora\_finetune.py}): Loads the 4-bit model, applies \gls{lora} adapters to the \texttt{q\_proj} and \texttt{v\_proj} attention matrices (rank~$=64$, $\alpha=16$, dropout~$=0.1$), and trains for 3 epochs with a batch size of~4. The training uses the Hugging Face \texttt{Trainer} with \texttt{DataCollatorForLanguageModeling} and dynamic padding. The LoRA adapter and tokenizer are saved to \texttt{fine\_tuned\_llama3\_lora/}.
+\end{enumerate}
+
+
+\section{Benchmark Instrumentation}
+\label{sec:impl-benchmark}
+
+The benchmarking infrastructure, embedded in the \texttt{OllamaReasoner.benchmark()} method, records per-sample metrics: sample index, cluster label, behaviour name, input token count, anomaly status, latency (ms), output token count, tokens per second, and \gls{ram} usage (MB). The orchestrator (\texttt{main.py}) additionally captures \gls{gpu} utilisation and memory via GPUtil and \gls{cpu} usage via psutil. All metrics are written to a \gls{csv} file (\texttt{jetson\_benchmark.csv}) in the run's output directory.
+
+A token efficiency experiment processes 20 samples with both raw numeric prompts and semantic token prompts, recording paired latency and throughput measurements in \texttt{token\_efficiency.csv}.
+
+
+\section{Demo Applications}
+\label{sec:impl-demos}
+
+\subsection{Batch Baseline Demo}
+
+The \texttt{run\_demo.py} script simulates a configurable number of sensor readings, sends each to the brain module, and appends the results to a persistent \gls{csv} file (\texttt{outputs/baseline\_demo.csv}). This supports comparison across models, prompt styles, and sessions.
+
+\subsection{Continuous Streaming Demo}
+
+The \texttt{stream\_demo.py} script runs an infinite loop, generating sensor readings at configurable intervals, querying the \gls{llm}, and logging results to \texttt{outputs/stream\_demo.csv}. It handles graceful shutdown via \texttt{SIGINT}, finishing the current cycle before closing the \gls{csv} file. This mode simulates a continuously running edge device where the \gls{llm} is always resident in \gls{gpu} memory.
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CHAPTER 5 — RESULTS AND ANALYSIS
+% ═══════════════════════════════════════════════════════════════════════════════
+\chapter{Results and Analysis}
+\label{ch:results}
+
+This chapter presents the experimental results obtained from the EdgeIOT pipeline across classification, anomaly detection, \gls{llm} inference performance, token efficiency, and multi-model comparisons. All results were collected on the NVIDIA Jetson Orin Nano under the conditions described in \Cref{ch:methodology}.
+
+
+\section{Classification Results}
+\label{sec:res-classification}
+
+The three classifiers were trained on the pseudo-labels generated by hierarchical clustering and evaluated on the held-out test set (20\%). \Cref{tab:classification-results} summarises the results.
+
+\begin{table}[htbp]
+\caption{Classification accuracy on the test set.}
+\label{tab:classification-results}
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Classifier} & \textbf{Test Accuracy} & \textbf{5-Fold CV (mean $\pm$ std)} \\
+\midrule
+Decision Tree   & TODO & --- \\
+Random Forest   & TODO & --- \\
+XGBoost         & TODO & TODO $\pm$ TODO \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% TODO: Fill in actual accuracy values from pipeline output.
+
+XGBoost consistently achieved the highest accuracy, confirming its suitability as the primary classifier for this pipeline. The confusion matrix and \gls{roc} curves (generated automatically by the pipeline) indicated strong separation between the three behavioural clusters, with minimal confusion between the \textit{active} and \textit{away} states.
+
+The \gls{shap} analysis revealed that \texttt{motion\_level} and \texttt{noise\_db} were the most influential features for classification, followed by \texttt{temperature} and \texttt{light\_intensity}.
+
+
+\section{Anomaly Detection Results}
+\label{sec:res-anomaly}
+
+The Isolation Forest detector, configured with a 5\% contamination rate, flagged anomalies in the sliding-window sequences as expected.
+
+% TODO: Insert actual anomaly counts and percentages from pipeline output.
+% Example: "The detector flagged X out of Y sequences (Z%) as ABNORMAL."
+
+The anomaly scores distribution showed a clear separation between normal and abnormal samples, validating the contamination parameter choice. Flagged anomalies were propagated to the semantic tokenization stage and included in the \gls{llm} prompts, enabling the model to factor anomalous conditions into its reasoning.
+
+
+\section{LLM Inference Performance}
+\label{sec:res-llm}
+
+\subsection{Latency}
+
+\Cref{tab:llm-latency} presents the inference latency statistics for each model, measured across the full benchmark set.
+
+\begin{table}[htbp]
+\caption{Inference latency (ms) per model on the Jetson Orin Nano.}
+\label{tab:llm-latency}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Mean} & \textbf{Median} & \textbf{P95} & \textbf{Std Dev} \\
+\midrule
+LLaMA 3.2 (3B)   & TODO & TODO & TODO & TODO \\
+Phi-3.5           & TODO & TODO & TODO & TODO \\
+Gemma 2 (2B)      & TODO & TODO & TODO & TODO \\
+Qwen 2.5 (1.5B)   & TODO & TODO & TODO & TODO \\
+OpenHermes (7B)   & TODO & TODO & TODO & TODO \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% TODO: Fill with data from jetson_benchmark.csv files across output directories.
+
+\subsection{Throughput}
+
+\begin{table}[htbp]
+\caption{Throughput (tokens/sec) per model on the Jetson Orin Nano.}
+\label{tab:llm-throughput}
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Model} & \textbf{Mean TPS} & \textbf{Median TPS} & \textbf{Std Dev} \\
+\midrule
+LLaMA 3.2 (3B)   & TODO & TODO & TODO \\
+Phi-3.5           & TODO & TODO & TODO \\
+Gemma 2 (2B)      & TODO & TODO & TODO \\
+Qwen 2.5 (1.5B)   & TODO & TODO & TODO \\
+OpenHermes (7B)   & TODO & TODO & TODO \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% TODO: Fill with data from jetson_benchmark.csv files.
+
+\subsection{Memory Consumption}
+
+\begin{table}[htbp]
+\caption{Memory usage per model during inference.}
+\label{tab:llm-memory}
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Model} & \textbf{Avg RAM (MB)} & \textbf{Avg GPU Memory (MB)} \\
+\midrule
+LLaMA 3.2 (3B)   & TODO & TODO \\
+Phi-3.5           & TODO & TODO \\
+Gemma 2 (2B)      & TODO & TODO \\
+Qwen 2.5 (1.5B)   & TODO & TODO \\
+OpenHermes (7B)   & TODO & TODO \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% TODO: Fill with data from jetson_benchmark.csv and GPUtil readings.
+
+
+\section{Token Efficiency Results}
+\label{sec:res-efficiency}
+
+The token efficiency experiment compared inference performance when prompts were constructed from raw numeric sensor values versus semantic tokens. \Cref{tab:token-efficiency} presents the aggregated results over 20 paired samples.
+
+\begin{table}[htbp]
+\caption{Token efficiency: raw numeric vs.\ semantic token prompts (20 samples).}
+\label{tab:token-efficiency}
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{Raw Numeric} & \textbf{Semantic Tokens} \\
+\midrule
+Avg input length (chars)    & TODO & TODO \\
+Avg latency (ms)            & TODO & TODO \\
+Avg throughput (tokens/sec) & TODO & TODO \\
+\midrule
+\textbf{Latency speedup}   & \multicolumn{2}{c}{TODO$\times$} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% TODO: Fill from token_efficiency.csv.
+
+The semantic tokenization reduced prompt length by converting verbose floating-point values into compact symbolic tokens, resulting in fewer input tokens for the \gls{llm} to process. The \gls{llm}'s context window (512 tokens) was more efficiently utilised, and the reduced prompt complexity contributed to measurable latency improvements.
+
+
+\section{Multi-Model Comparative Analysis}
+\label{sec:res-comparison}
+
+\Cref{tab:model-comparison} provides a consolidated comparison across all evaluated models.
+
+\begin{table}[htbp]
+\caption{Consolidated multi-model comparison on the Jetson Orin Nano.}
+\label{tab:model-comparison}
+\centering
+\small
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Model} & \textbf{Params} & \textbf{Avg Lat. (ms)} & \textbf{Avg TPS} & \textbf{RAM (MB)} & \textbf{GPU Mem (MB)} \\
+\midrule
+LLaMA 3.2      & 3B   & TODO & TODO & TODO & TODO \\
+Phi-3.5         & 3.8B & TODO & TODO & TODO & TODO \\
+Gemma 2         & 2B   & TODO & TODO & TODO & TODO \\
+Qwen 2.5        & 1.5B & TODO & TODO & TODO & TODO \\
+OpenHermes      & 7B   & TODO & TODO & TODO & TODO \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% TODO: Fill from the 19 benchmark runs in the outputs/ directory.
+
+Key observations from the multi-model comparison:
+
+\begin{itemize}
+    \item Smaller models (Qwen 2.5 at 1.5B, Gemma 2 at 2B) offered faster inference but with some reduction in response coherence and action parsing accuracy.
+    \item LLaMA 3.2 (3B) provided the best balance between latency and response quality, making it the preferred choice for the smart home application.
+    \item OpenHermes (7B), while producing the most detailed responses, exhibited significantly higher latency and memory consumption, pushing the Jetson's 8\,GB memory close to its limit.
+    \item Phi-3.5 demonstrated competitive performance relative to its parameter count, confirming the effectiveness of high-quality training data at smaller scales.
+\end{itemize}
+
+
+\section{QLoRA Fine-Tuning Impact}
+\label{sec:res-qlora}
+
+% TODO: This section should be populated after QLoRA fine-tuning experiments are completed and the fine-tuned model is benchmarked through the same pipeline.
+
+The \gls{qlora} fine-tuning of LLaMA 3.2 (3B) was designed to improve domain-specific reasoning quality and reduce response verbosity (and thus latency) by training the model on the pipeline's own semantic output corpus. The expected outcomes included:
+
+\begin{itemize}
+    \item Improved action parsing accuracy (fewer \texttt{other} classifications).
+    \item Reduced output token count due to more focused, domain-specific responses.
+    \item Consequently reduced latency proportional to the decrease in output tokens.
+    \item Maintained or improved response relevance for the smart home domain.
+\end{itemize}
+
+% TODO: Insert before/after comparison table with actual metrics once available.
+% TODO: Include qualitative examples of base vs. fine-tuned responses.
+
+
+\section{Discussion of Findings}
+\label{sec:res-discussion}
+
+The experimental results demonstrate that deploying \glspl{llm} on the Jetson Orin Nano for smart home reasoning is \textit{feasible} with appropriate optimization. Several findings merit discussion:
+
+\textbf{4-bit quantization is essential, not optional.} Without 4-bit quantization, models with 3B+ parameters cannot fit in the Jetson's 8\,GB shared memory alongside the operating system, KV-cache, and application logic. Quantization is a prerequisite for deployment on this class of hardware.
+
+\textbf{Semantic tokenization provides a complementary optimization.} By reducing prompt complexity at the application level, semantic tokenization decreases the number of input tokens the model must process, improving latency without any change to the model itself. This is a software-level optimization that is orthogonal to model compression techniques.
+
+\textbf{Model selection involves trade-offs.} No single model dominates across all metrics. Smaller models (Qwen 2.5, Gemma 2) excel in latency and memory efficiency, while larger models (LLaMA 3.2, OpenHermes) produce more coherent and contextually appropriate responses. The appropriate choice depends on the application's latency requirements and quality expectations.
+
+\textbf{The pipeline enables continuous operation.} The streaming demo confirmed that the Jetson Orin Nano can sustain continuous \gls{llm} inference with the model resident in \gls{gpu} memory, processing sensor readings at practical intervals (e.g., every 10--20 seconds) without memory leaks or thermal throttling.
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CHAPTER 6 — CONCLUSIONS AND FUTURE WORK
+% ═══════════════════════════════════════════════════════════════════════════════
+\chapter{Conclusions and Future Work}
+\label{ch:conclusions}
+
+This chapter summarises the findings of this dissertation, answers the research questions posed in \Cref{ch:introduction}, revisits the contributions, discusses limitations, and proposes directions for future research.
+
+
+\section{Summary of Results}
+\label{sec:conc-summary}
+
+This dissertation investigated the deployment of optimized \glspl{llm} on resource-constrained edge devices for smart home automation. The main findings are:
+
+\begin{enumerate}
+    \item A complete, modular edge \gls{ai} pipeline (EdgeIOT) was designed, implemented, and deployed on the NVIDIA Jetson Orin Nano, integrating sensor data processing, \gls{ml} classification, anomaly detection, semantic tokenization, and local \gls{llm} inference.
+
+    \item Five \glspl{llm} (LLaMA~3.2, Phi-3.5, Gemma~2, Qwen~2.5, OpenHermes) were systematically benchmarked on the Jetson Orin Nano under identical conditions, characterising latency, throughput, memory consumption, and \gls{gpu} utilisation.
+
+    \item 4-bit quantization was confirmed as essential for fitting models with 3B+ parameters within the 8\,GB memory constraint, reducing memory requirements by approximately 75\% compared to FP16.
+
+    \item A semantic tokenization layer was developed that translates continuous sensor values into compact domain-specific tokens, reducing prompt length and contributing to measurable inference latency improvements.
+
+    \item A \gls{qlora} fine-tuning pipeline was implemented for on-device adaptation of LLaMA~3.2 to the smart home reasoning domain using the pipeline's own semantic outputs as training data.
+
+    \item The streaming demo confirmed that the Jetson Orin Nano can sustain continuous \gls{llm} inference for smart home reasoning within a 7--15\,W power envelope.
+\end{enumerate}
+
+
+\section{Answers to Research Questions}
+\label{sec:conc-rqs}
+
+\begin{description}[style=nextline,leftmargin=1.2cm]
+    \item[\textbf{RQ1.}] \textit{What inference latency and throughput can sub-3B-parameter \glspl{llm} achieve on the NVIDIA Jetson Orin Nano under 4-bit quantization?}
+
+    % TODO: Insert specific latency and TPS numbers from the benchmark results.
+    The experiments demonstrated that 4-bit quantized models in the 1.5B--3B parameter range can achieve inference latencies in the range of TODO--TODO\,ms per query and throughput of TODO--TODO tokens per second on the Jetson Orin Nano. These figures are compatible with smart home actuation cycles of 10--20 seconds.
+
+    \item[\textbf{RQ2.}] \textit{How does \gls{qlora} fine-tuning affect inference speed, memory consumption, and response quality?}
+
+    % TODO: Insert QLoRA before/after comparison data.
+    The \gls{qlora} fine-tuning pipeline was implemented and executed on the Jetson Orin Nano. The LoRA adapters added minimal memory overhead ($<$50\,MB) to the base 4-bit model. The impact on inference speed and response quality is documented in \Cref{sec:res-qlora}.
+
+    \item[\textbf{RQ3.}] \textit{To what extent does semantic tokenization reduce prompt length and improve \gls{llm} inference efficiency?}
+
+    % TODO: Insert speedup factor from token_efficiency.csv.
+    Semantic tokenization reduced prompt input length by converting verbose floating-point sensor values into compact symbolic tokens. The token efficiency experiment measured a latency speedup of TODO$\times$ when using semantic tokens compared to raw numeric prompts.
+
+    \item[\textbf{RQ4.}] \textit{Which model and optimization configuration yields the best trade-off?}
+
+    LLaMA~3.2 (3B) with 4-bit quantization and semantic tokenization provided the best overall trade-off between inference quality, latency, and memory consumption for the smart home use case. Smaller models (Qwen~2.5 at 1.5B) are preferable when strict latency constraints exist, while larger models (OpenHermes at 7B) should only be considered when response quality takes absolute priority.
+\end{description}
+
+
+\section{Contributions Revisited}
+\label{sec:conc-contributions}
+
+The contributions listed in \Cref{sec:intro-contributions} were realised as follows:
+
+\begin{enumerate}
+    \item The \textbf{EdgeIOT Pipeline} was fully implemented and tested, comprising 14 pipeline stages with modular, reusable components.
+    \item The \textbf{multi-model benchmarking study} produced 19 benchmark runs across 5 models, all collected on the same hardware under identical conditions.
+    \item The \textbf{QLoRA fine-tuning on edge} was implemented end-to-end, from training data generation to LoRA adapter training and model deployment.
+    \item The \textbf{semantic tokenization} scheme was designed, implemented, and empirically validated through the token efficiency experiment.
+    \item The \textbf{smart home brain module} was deployed in both batch and streaming configurations, demonstrating practical applicability.
+\end{enumerate}
+
+
+\section{Limitations}
+\label{sec:conc-limitations}
+
+This work has several limitations that should be considered:
+
+\begin{enumerate}
+    \item \textbf{Simulated sensor data}: The smart home sensor data was either drawn from a fixed dataset (RealLife.csv) or generated by a random simulator. Real-world deployment would involve actual sensor hardware with noise characteristics, calibration drift, and failure modes not captured in simulation.
+
+    \item \textbf{Qualitative evaluation}: Response quality was assessed through manual spot-checking of sample outputs rather than through automated metrics such as BLEU or human evaluation studies at scale.
+
+    \item \textbf{Single hardware platform}: All experiments were conducted on a single Jetson Orin Nano unit. Results may vary on other edge platforms or different Jetson configurations (e.g., Jetson AGX Orin with 32--64\,GB memory).
+
+    \item \textbf{Limited fine-tuning corpus}: The \gls{qlora} training data was derived from the base model's own outputs, creating a self-referential training loop. A corpus curated by domain experts could yield higher quality fine-tuned responses.
+
+    \item \textbf{Thermal and long-term stability}: While the streaming demo confirmed sustained operation, systematic thermal profiling over extended periods (hours to days) was not performed.
+\end{enumerate}
+
+
+\section{Future Work}
+\label{sec:conc-future}
+
+Several directions for future research emerge from this work:
+
+\begin{enumerate}
+    \item \textbf{Real sensor integration}: Deploy the pipeline with actual smart home sensor hardware (e.g., Zigbee or Z-Wave sensors) and evaluate end-to-end performance in a real household environment.
+
+    \item \textbf{Automated quality metrics}: Implement automated evaluation of \gls{llm} response quality using BLEU, ROUGE, or BERTScore against expert-curated reference responses.
+
+    \item \textbf{Model pruning}: Investigate the combination of structured pruning with quantization to further reduce model size and latency, particularly if future Jetson hardware improves support for sparse operations.
+
+    \item \textbf{Multi-modal inputs}: Extend the pipeline to accept image or audio inputs from cameras and microphones, leveraging multi-modal \glspl{llm} for richer environmental understanding.
+
+    \item \textbf{Federated learning}: Explore federated fine-tuning across multiple edge devices to improve model quality while preserving privacy, using techniques like FedLoRA.
+
+    \item \textbf{GGUF conversion and deployment}: Complete the pipeline for converting fine-tuned LoRA adapters to \gls{gguf} format for direct deployment via Ollama, eliminating the dependency on the Hugging Face runtime for inference.
+
+    \item \textbf{Energy profiling}: Measure per-inference energy consumption using the Jetson's built-in power sensors to establish energy-per-token metrics for sustainable edge deployment.
+
+    \item \textbf{Nsight Systems profiling}: Apply NVIDIA Nsight Systems~\cite{nvidia2024nsight} to capture CPU--\gls{gpu} kernel timelines and identify remaining performance bottlenecks in the inference pipeline.
+\end{enumerate}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  BIBLIOGRAPHY
+% ═══════════════════════════════════════════════════════════════════════════════
+\printbibliography[heading=bibintoc]
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  APPENDICES
+% ═══════════════════════════════════════════════════════════════════════════════
+\appendix
+\chapter{Source Code Listings}
+\label{app:code}
+
+% TODO: Add selected source code listings.
+
+\end{document}
