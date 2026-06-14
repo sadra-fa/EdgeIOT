@@ -1,0 +1,134 @@
+[
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-06T23:03:17.861295+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]",
+      "[MOTION_ACTIVE]"
+    ],
+    "llm_reasoning": "It appears that the homeowner is likely waking up from sleep due to a noise spike, and no immediate action is required as the predicted behavior indicates they should be awake anyway."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-06T23:03:17.861776+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[MOTION_ACTIVE]"
+    ],
+    "llm_reasoning": "A motion event has occurred while the system predicted that the occupant was asleep, suggesting that someone may have entered or exited the room unexpectedly, requiring a potential alert to the homeowner's smartphone or voice assistant."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-06T23:03:17.862002+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]"
+    ],
+    "llm_reasoning": "The high temperature sensor event indicates that the temperature has exceeded a predetermined threshold, triggering the predicted behavior of being \"active\", suggesting that the system should take corrective action to mitigate the heat, such as activating cooling or ventilation systems."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-06T23:03:17.862217+00:00",
+    "prediction": {
+      "label": 2,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[LOW_LIGHT]"
+    ],
+    "llm_reasoning": "The user has left the house, as indicated by the \"away\" prediction, suggesting that no further actions are required to adjust lighting levels or temperature settings."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-06T23:03:17.862429+00:00",
+    "prediction": {
+      "label": 1,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_HIGH]",
+      "[HUMIDITY_HIGH]",
+      "[NOISE_SPIKE]"
+    ],
+    "llm_reasoning": "It appears that the household is experiencing high temperatures and humidity levels, potentially triggering an alarm or notification to ensure occupant safety, but since it's predicted to be a normal sleep period, no immediate action is required."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-06T23:03:17.862634+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[HUMIDITY_LOW]"
+    ],
+    "llm_reasoning": "The low humidity level is triggering the system to activate its dehumidification mode, which may require manual intervention to adjust settings or initiate a cleaning cycle to maintain optimal indoor air quality."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-06T23:03:17.862838+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[NOISE_SPIKE]"
+    ],
+    "llm_reasoning": "A sudden noise spike has been detected, indicating potential disturbance or malfunction within the home, and I recommend triggering a smart alarm and alerting the homeowner to investigate and take necessary actions."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-06T23:03:17.863032+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 0.9990000128746033
+    },
+    "semantic_tokens": [],
+    "llm_reasoning": "The system is likely waiting for a sensor event to trigger an action, but since there's no current sensor event, no immediate action is required."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-06T23:03:17.863227+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [
+      "[TEMP_LOW]",
+      "[HUMIDITY_LOW]"
+    ],
+    "llm_reasoning": "The system is detecting low temperature and humidity levels, indicating the need to activate the heating and humidification systems to maintain a comfortable indoor environment."
+  },
+  {
+    "schema_version": "2.0",
+    "task_id": "smart_home_edge_ai",
+    "timestamp": "2026-06-06T23:03:17.863418+00:00",
+    "prediction": {
+      "label": 0,
+      "confidence": 1.0
+    },
+    "semantic_tokens": [],
+    "llm_reasoning": "The system is currently idle with no sensor events detected, but it's predicted to become active soon, suggesting that the user may be approaching or entering the space, prompting a potential notification or alert to be triggered."
+  }
+]
