@@ -17,14 +17,36 @@ import time
 from typing import Dict
 
 import requests
+from typing import List, Dict, Any
 
 from edgeiot.config import OllamaConfig
 
 logger = logging.getLogger(__name__)
 
+# ── Helper ─────────────────────────────────────────────────────────────────────
+def format_history(history: List[Dict[str, Any]]) -> str:
+    """Return a markdown table summarising recent events.
+    Each entry should be a dict with keys:
+        - "sensor": the sensor dict from that cycle
+        - "action": the parsed action dict from that cycle
+    Only the last 1 event is shown (as per user request).
+    """
+    if not history:
+        return ""
+    lines = ["| Timestamp | Temp (°C) | Action |", "|---|---|---|"]
+    for entry in history[-1:]:
+        sensor = entry.get("sensor", {})
+        action = entry.get("action", {}).get("action", "")
+        ts = sensor.get("timestamp", "")
+        temp = sensor.get("temperature", "")
+        lines.append(f"| {ts} | {temp} | {action} |")
+    return "\n".join(lines) + "\n"
+
+
+
 # ── Prompt builder ───────────────────────────────────────────────────────────
 
-def build_prompt(sensor: dict, style: str = "hybrid") -> str:
+def build_prompt(sensor: dict, desired_temp: float | None = None, history: list[dict] | None = None, style: str = "hybrid") -> str:
     """Create a natural-language prompt for the LLM from a sensor dict.
 
     Styles
@@ -33,12 +55,27 @@ def build_prompt(sensor: dict, style: str = "hybrid") -> str:
     compact : terse one-liner.
     hybrid  : friendly description + key-value list (default).
     """
-    if style == "raw":
-        return (
-            "You are the brain of a smart home running on an edge device.\n"
-            f"Sensor reading: {json.dumps(sensor)}\n"
-            "What action should the home take? Reply with a short answer."
-        )
+    # Base description
+    base_prompt = (
+        "You are an AI assistant embedded in a smart‑home edge device.\n"
+        "The sensors currently report:\n"
+        f"  • Temperature : {sensor['temperature']} °C\n"
+        f"  • Motion detected : {'yes' if sensor['motion'] else 'no'}\n"
+        f"  • Noise level : {sensor['noise']} dB\n"
+    )
+
+    # Desired temperature context
+    if desired_temp is not None:
+        base_prompt += f"Desired temperature is set to {desired_temp} °C (acceptable range 15‑25 °C).\nIf the current temperature is below the desired value, the system should turn on the heater; if above, it should turn on the air conditioner.\n"
+
+    # History context (last few events)
+    if history:
+        base_prompt += "Recent history:\n"
+        base_prompt += format_history(history)
+
+    # Action request
+    base_prompt += "Based on this information, decide what action the smart home should take. Reply in one concise paragraph."
+    return base_prompt
 
     if style == "compact":
         motion_str = "motion detected" if sensor["motion"] else "no motion"
@@ -86,9 +123,13 @@ _ACTION_KEYWORDS = {
     "adjust_ac":        ["turn on air conditioner", "turn on the ac",
                          "cool the room", "lower the temperature",
                          "activate cooling", "turn on cooling",
-                         "air conditioning"],
+                         "air conditioning", "decrease temperature", "lower the temperature", "cool down"],
     "turn_off_ac":      ["turn off air conditioner", "turn off the ac",
                          "disable cooling"],
+    "turn_on_ac":       ["turn on air conditioner", "activate cooling", "start AC", "cool down", "lower the temperature", "decrease temperature"],
+    "turn_off_ac":      ["turn off air conditioner", "disable cooling", "stop AC"],
+    "turn_on_heater":   ["turn on heater", "turn on the heater", "activate heating", "start heating", "increase temperature", "raise temperature", "heat up"],
+    "turn_off_heater":  ["turn off heater", "disable heating", "stop heating", "stop heating", "turn off heating"],
     "close_windows":    ["close windows", "close the windows",
                          "shut the windows"],
     "open_windows":     ["open windows", "open the windows"],
@@ -106,11 +147,19 @@ _ACTION_KEYWORDS = {
 
 
 def parse_reply(reply: str) -> dict:
-    """Extract a structured action from the LLM plain-text reply."""
+    """Extract a structured action from the LLM plain-text reply.
+    The function first checks the explicit keyword lists. If none match,
+    it falls back to generic matching for common HVAC terms.
+    """
     lowered = reply.lower()
     for action, keywords in _ACTION_KEYWORDS.items():
         if any(kw in lowered for kw in keywords):
             return {"action": action}
+    # Generic fallback checks – these catch truncated or paraphrased phrasing.
+    if "heater" in lowered or "heating" in lowered:
+        return {"action": "turn_on_heater"}
+    if "air conditioner" in lowered or "air conditioning" in lowered or "ac" in lowered:
+        return {"action": "adjust_ac"}
     return {"action": "other", "note": "no recognised keyword matched"}
 
 
@@ -120,6 +169,8 @@ def run(
     sensor: dict,
     config: OllamaConfig | None = None,
     style: str = "hybrid",
+    desired_temp: float | None = None,
+    history: list[dict] | None = None,
 ) -> dict:
     """Full cycle: build prompt → query LLM → parse reply.
 
@@ -137,7 +188,7 @@ def run(
     if config is None:
         config = OllamaConfig()
 
-    prompt = build_prompt(sensor, style)
+    prompt = build_prompt(sensor, desired_temp=desired_temp, history=history, style=style)
 
     start = time.perf_counter()
     try:

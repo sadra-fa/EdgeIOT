@@ -46,16 +46,37 @@ signal.signal(signal.SIGINT, _handle_sigint)
 
 def main():
     parser = argparse.ArgumentParser(description="Stream sensor → LLM → CSV")
-    parser.add_argument("--interval", type=float, default=0,
-                        help="Seconds between sensor reads (default: 0)")
-    parser.add_argument("--model", type=str, default="llama3.2:3b",
-                        help="Ollama model name (default: llama3.2:3b)")
-    parser.add_argument("--outdir", type=str, default="outputs",
-                        help="Directory to store the CSV log")
+    parser.add_argument(
+        "--interval",
+        type=float,
+        default=0,
+        help="Seconds between sensor reads (default: 0)"
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="llama3.2:3b",
+        help="Ollama model name (default: llama3.2:3b)"
+    )
+    parser.add_argument(
+        "--desired-temp",
+        type=float,
+        default=None,
+        help="Desired temperature in °C (optional)"
+    )
+    parser.add_argument(
+        "--outdir",
+        type=str,
+        default="outputs",
+        help="Directory to store the CSV log (default: outputs folder in project root)"
+    )
     args = parser.parse_args()
 
     # Prepare CSV
+    # If a relative path is provided, resolve it against the project root directory
     out_dir = Path(args.outdir)
+    if not out_dir.is_absolute():
+        out_dir = project_root / out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
     csv_path = out_dir / "stream_demo.csv"
     FIELDNAMES = [
@@ -69,6 +90,7 @@ def main():
         "action_json",
         "latency_ms",
         "model",
+        "previous_action",
     ]
     file_exists = csv_path.exists()
     csv_file = csv_path.open("a", newline="")
@@ -78,6 +100,7 @@ def main():
 
     # LLM configuration
     config = OllamaConfig(model=args.model)
+    history = []
 
     print(f"╔══════════════════════════════════════════════╗")
     print(f"║   EdgeIOT Smart-Home Stream (on-device LLM)  ║")
@@ -100,7 +123,17 @@ def main():
               f"motion={'yes' if sensor['motion'] else 'no'}  "
               f"noise={sensor['noise']} dB")
 
-        result = brain_run(sensor, config=config, style="hybrid")
+        previous_action = history[-1]["action"]["action"] if history else ""
+        result = brain_run(
+            sensor,
+            config=config,
+            style="hybrid",
+            desired_temp=args.desired_temp,
+            history=history,
+        )
+        # If the suggested action repeats the previous one, treat it as no_action
+        if result["action"]["action"] == previous_action:
+            result["action"] = {"action": "no_action"}
 
         print(f"  LLM     → {result['raw_reply'][:120]}{'…' if len(result['raw_reply']) > 120 else ''}")
         print(f"  Action  → {json.dumps(result['action'])}")
@@ -118,7 +151,10 @@ def main():
             "action_json": json.dumps(result["action"]),
             "latency_ms": f"{result['latency_ms']:.2f}",
             "model": args.model,
+            "previous_action": previous_action,
         })
+        # Append this event to history for the next cycle
+        history.append({"sensor": sensor, "action": result["action"]})
         csv_file.flush()
         if args.interval and not _stop_requested:
             time.sleep(args.interval)

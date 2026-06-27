@@ -43,6 +43,7 @@ FIELDNAMES = [
     "action_json",
     "latency_ms",
     "model",
+    "previous_action",
 ]
 
 
@@ -64,8 +65,16 @@ def main():
         help="Prompt style to use (default: hybrid)",
     )
     parser.add_argument(
-        "--model", type=str, default="llama3.2:3b",
+        "--model",
+        type=str,
+        default="llama3.2:3b",
         help="Ollama model name (default: llama3.2:3b)",
+    )
+    parser.add_argument(
+        "--desired-temp",
+        type=float,
+        default=None,
+        help="Desired temperature in °C (optional)",
     )
     parser.add_argument(
         "--outdir", type=str, default="outputs",
@@ -93,6 +102,8 @@ def main():
 
     # Append to existing CSV; write header only if file is new
     file_exists = csv_path.exists()
+    # History of events for this run (sensor + action)
+    history: list[dict] = []
     with csv_path.open("a", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
         if not file_exists:
@@ -107,7 +118,15 @@ def main():
                   f"noise={sensor['noise']} dB")
 
             # 2. Send to brain (prompt + Ollama + parse)
-            result = brain_run(sensor, config=config, style=args.style)
+            # Determine previous action for CSV (empty for first cycle)
+            previous_action = history[-1]["action"]["action"] if history else ""
+            result = brain_run(
+                sensor,
+                config=config,
+                style=args.style,
+                desired_temp=args.desired_temp,
+                history=history,
+            )
 
             print(f"  LLM    → {result['raw_reply'][:500]}{'…' if len(result['raw_reply']) > 500 else ''}")
             print(f"  Action → {json.dumps(result['action'])}")
@@ -126,7 +145,10 @@ def main():
                 "action_json":  json.dumps(result["action"]),
                 "latency_ms":   f"{result['latency_ms']:.2f}",
                 "model":        args.model,
+                "previous_action": previous_action,
             })
+            # Append this event to history for the next cycle
+            history.append({"sensor": sensor, "action": result["action"]})
             f.flush()   # make sure partial results survive crashes
 
             # 4. Wait between cycles (if streaming)
