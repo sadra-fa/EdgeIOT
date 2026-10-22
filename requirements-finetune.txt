@@ -1,0 +1,19 @@
+# QLoRA fine-tuning and export (install after requirements.txt)
+# PyTorch from the official CUDA 13.0 index:
+#   pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cu130 \
+#       --extra-index-url https://pypi.org/simple
+# On JetPack 7.2.1 the CUDA libraries in the virtual environment must be on the
+# loader path before running scripts/04 and scripts/05:
+#   export LD_LIBRARY_PATH=$VIRTUAL_ENV/lib/python3.12/site-packages/nvpl/lib:$VIRTUAL_ENV/lib/python3.12/site-packages/nvidia/cu13/lib:$LD_LIBRARY_PATH
+torch==2.14.1
+transformers==5.20.1
+peft==0.21.2
+bitsandbytes==0.50.2
+accelerate==1.15.0
+safetensors==0.8.0
+nvpl-blas==0.6.0
+nvpl-lapack==0.4.0.1
+nvidia-cudss-cu13==0.8.0.10
+gguf  # from llama.cpp (commit c0fd786): pip install tools/llama.cpp/gguf-py
+sentencepiece==0.2.2  # needed by convert_hf_to_gguf.py
+cmake  # to build llama-quantize: cmake -B build -DGGML_CUDA=OFF && cmake --build build --target llama-quantize

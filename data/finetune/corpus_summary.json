@@ -1,0 +1,8 @@
+{
+  "pool_rows": 5900,
+  "combinations": 106,
+  "valid_combinations": 85,
+  "train_rows": 1000,
+  "teacher": "llama3.2:3b",
+  "held_out_rows": 100
+}

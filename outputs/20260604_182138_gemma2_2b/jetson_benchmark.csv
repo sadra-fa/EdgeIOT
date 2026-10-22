@@ -1,6 +1,0 @@
-sample,cluster,behaviour,n_tokens_in,is_anomaly,latency_ms,tokens_out,tokens_per_sec,ram_mb,reasoning
-0,1,sleeping,3,False,3830.6,35,11.14,231.7,"The house is becoming more active with the presence of motion and a spike in noise, so it's likely preparing for sleep by dimming lights and lowering temperature."
-1,1,sleeping,1,False,4536.7,39,10.19,227.0,"It's likely someone is asleep based on the motion event, so I should adjust the smart home settings to reflect that (e.g., turn off lights, lower thermostat)."
-2,0,active,1,False,3002.0,22,9.53,201.2,"The temperature is high, so the system should activate cooling features or adjust settings to maintain comfort."
-3,2,away,2,False,3418.8,31,11.6,197.5,"It's likely the homeowner has left the house, indicated by low light and temperature, so I should adjust the smart home settings accordingly."
-4,1,sleeping,3,False,3821.4,28,8.86,190.9,"It's likely the house is getting too warm and humid, prompting the smart home to enter sleep mode to conserve energy."

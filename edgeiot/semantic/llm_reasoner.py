@@ -7,11 +7,16 @@ import psutil
 import requests
 
 from edgeiot.config import OllamaConfig
+from edgeiot.semantic.actions import CANONICAL_ACTIONS, check_reply
 
 logger = logging.getLogger(__name__)
 
-# Human-readable cluster name mapping (matches original script)
-CLUSTER_NAMES: Dict[int, str] = {0: "active", 1: "sleeping", 2: "away"}
+# Names of the Ward clusters, read from their composition in RealLife.csv
+# (see pipeline_metrics.json: cluster_vs_behaviour and the location crosstab):
+#   0 = studying/eating in cafes, libraries and study rooms
+#   1 = walking/stressed in streets, traffic, offices and meeting rooms
+#   2 = sleeping in bedrooms and dorm rooms
+CLUSTER_NAMES: Dict[int, str] = {0: "sedentary", 1: "active", 2: "sleeping"}
 
 
 def discover_ollama_models() -> List[Dict]:
@@ -66,73 +71,129 @@ def select_model_interactive(models: List[Dict]) -> str:
         pass
     return models[0]["name"]
 
-class OllamaReasoner:
-    """Sends semantic token prompts to a locally-hosted LLM via the Ollama REST API."""
+# ── Prompt construction ──────────────────────────────────────────────────────
+# The preamble is identical in every condition; only the "Observed Events"
+# fragment changes between the raw and the semantic representation.
+PROMPT_PREAMBLE = (
+    "System: You are an autonomous Edge AI smart home controller running "
+    "locally on an NVIDIA Jetson.\n"
+    "Analyze the inhabitant behavior and environmental tokens.\n"
+)
+PROMPT_INSTRUCTION = (
+    'Output strict JSON with fields: "reasoning" (string, one sentence) and '
+    '"action_json" (object with an "action" field). The action must be one of: '
+    + ", ".join(CANONICAL_ACTIONS) + "."
+)
+DEFAULT_OPTIONS = {
+    "temperature":    0.2,
+    "top_p":          0.9,
+    "top_k":          40,
+    "repeat_penalty": 1.1,
+    "num_ctx":        512,
+    "num_predict":    128,
+    "num_gpu":        99,
+    "seed":           42,
+}
 
-    def __init__(self, config: OllamaConfig):
+
+def semantic_fragment(tokens: List[str]) -> str:
+    """Variable part of the prompt in the semantic condition."""
+    return " ".join(tokens) if tokens else "[NO_EVENT]"
+
+
+def raw_fragment(z_values: Dict[str, float]) -> str:
+    """Variable part of the prompt in the raw condition (standardised readings)."""
+    return " ".join(f"{name}={value:.3f}" for name, value in z_values.items())
+
+
+def build_hybrid_prompt(state: str, fragment: str) -> str:
+    """Hybrid prompt (Listing 4.2): preamble + state + observed events + instruction."""
+    return (
+        PROMPT_PREAMBLE
+        + f"State: [STATE_{state.upper()}]\n"
+        + f"Observed Events: {fragment}\n"
+        + PROMPT_INSTRUCTION
+    )
+
+
+def build_finetuned_prompt(state: str, fragment: str) -> str:
+    """Instruction used by the fine-tuned model: state and events only, no preamble."""
+    return f"State: [STATE_{state.upper()}]\nObserved Events: {fragment}"
+
+
+# Template the adapter was trained with (scripts/04_qlora_finetune.py). The
+# fine-tuned model is queried in Ollama's raw mode with this exact text, because
+# Ollama applies the chat template embedded in the GGUF file otherwise.
+FINETUNED_TEMPLATE = "### Instruction:\n{instruction}\n\n### Response:\n"
+
+
+def wrap_finetuned(instruction: str) -> str:
+    return FINETUNED_TEMPLATE.format(instruction=instruction)
+
+
+class OllamaReasoner:
+    """Sends prompts to a locally hosted LLM via the Ollama REST API and records
+    the latency decomposition reported by Ollama for every request."""
+
+    def __init__(self, config: OllamaConfig, options: Optional[Dict] = None):
         self.url = config.url
         self.model = config.model
-        self.options = {
-            "temperature": 0.2,
-            "num_predict": 80,      # keep short for edge speed
-            "num_ctx":     512,     # smaller context = less VRAM
-        }
+        self.options = dict(DEFAULT_OPTIONS, **(options or {}))
 
-    def reason(self, semantic_tokens: List[str], cluster_label: int) -> Dict:
+    def generate(self, prompt: str, keep_alive: str = "10m", raw: bool = False) -> Dict:
+        """Send one prompt and return the reply together with Ollama's timing fields.
+
+        Durations are converted from nanoseconds to milliseconds:
+          prefill_ms = prompt_eval_duration, decode_ms = eval_duration.
         """
-        Build a prompt from tokens + cluster label, send to Ollama, and return
-        a dict with the LLM response and performance metrics.
-        """
-        token_str = " ".join(semantic_tokens) if semantic_tokens else "[NO_EVENT]"
-        behaviour = CLUSTER_NAMES.get(cluster_label, "unknown")
-
-        prompt = (
-            "You are an AI assistant embedded in a smart home edge device.\n"
-            f"Current sensor events : {token_str}\n"
-            f"Predicted behaviour   : {behaviour}\n\n"
-            "In one concise sentence, describe what is likely happening "
-            "and if any action is needed."
-        )
-
         start = time.perf_counter()
         try:
             resp = requests.post(
                 self.url,
                 json={
-                    "model":   self.model,
-                    "prompt":  prompt,
-                    "stream":  False,
-                    "options": self.options,
+                    "model":      self.model,
+                    "prompt":     prompt,
+                    "stream":     False,
+                    "options":    self.options,
+                    "keep_alive": keep_alive,
+                    "raw":        raw,
                 },
-                timeout=60,
+                timeout=300,
             )
             resp.raise_for_status()
             data = resp.json()
-
-            reasoning     = data.get("response", "").strip()
-            eval_count    = data.get("eval_count", 0)
-            eval_duration = data.get("eval_duration", 0)       # nanoseconds
-            load_duration = data.get("load_duration", 0)
-            tps = eval_count / (eval_duration / 1e9) if eval_duration > 0 else 0
+            error = ""
         except Exception as e:
             logger.warning(f"LLM call failed: {e}")
-            reasoning      = f"[LLM ERROR: {e}]"
-            eval_count     = 0
-            eval_duration  = 0
-            load_duration  = 0
-            tps            = 0
+            data, error = {}, str(e)
+        wall_ms = (time.perf_counter() - start) * 1000
 
-        latency_ms = (time.perf_counter() - start) * 1000
-        ram_mb     = psutil.Process().memory_info().rss / 1e6
-
+        eval_count = data.get("eval_count", 0)
+        eval_ns = data.get("eval_duration", 0)
         return {
-            "reasoning":      reasoning,
-            "latency_ms":     round(latency_ms, 1),
-            "ram_mb":         round(ram_mb, 1),
-            "tokens_out":     eval_count,
-            "tokens_per_sec": round(tps, 2),
-            "load_ms":        round(load_duration / 1e6, 1),
+            "response":          data.get("response", "").strip(),
+            "error":             error,
+            "prompt_eval_count": data.get("prompt_eval_count", 0),
+            "prefill_ms":        data.get("prompt_eval_duration", 0) / 1e6,
+            "eval_count":        eval_count,
+            "decode_ms":         eval_ns / 1e6,
+            "load_ms":           data.get("load_duration", 0) / 1e6,
+            "total_ms":          data.get("total_duration", 0) / 1e6,
+            "wall_ms":           wall_ms,
+            "tokens_per_sec":    eval_count / (eval_ns / 1e9) if eval_ns > 0 else 0.0,
+            "capped":            eval_count >= self.options["num_predict"],
+            "done_reason":       data.get("done_reason", ""),
         }
+
+    def reason(self, semantic_tokens: List[str], cluster_label: int) -> Dict:
+        """Build the hybrid prompt for one sample and query the model."""
+        state = CLUSTER_NAMES.get(cluster_label, "unknown")
+        prompt = build_hybrid_prompt(state, semantic_fragment(semantic_tokens))
+        r = self.generate(prompt)
+        r.update(check_reply(r["response"]))
+        r["prompt"] = prompt
+        r["latency_ms"] = r["wall_ms"]
+        return r
 
     def smoke_test(self, outputs: List[Dict], n: int = 3) -> List[Dict]:
         """Run quick inference on the first *n* output records and log results."""
@@ -147,10 +208,10 @@ class OllamaReasoner:
             logger.info(
                 f"Sample {i}  tokens={tokens or ['[NO_EVENT]']}  "
                 f"behaviour={CLUSTER_NAMES.get(label, '?')}  "
-                f"latency={result['latency_ms']}ms  "
-                f"tps={result['tokens_per_sec']}"
+                f"latency={result['wall_ms']:.0f}ms  "
+                f"tps={result['tokens_per_sec']:.2f}"
             )
-            logger.info(f"  → {result['reasoning']}")
+            logger.info(f"  → {result['response']}")
         return results
 
     def benchmark(
@@ -177,16 +238,21 @@ class OllamaReasoner:
             r      = self.reason(tokens, label)
 
             records.append({
-                "sample":         i,
-                "cluster":        label,
-                "behaviour":      CLUSTER_NAMES.get(label, "?"),
-                "n_tokens_in":    len(tokens),
-                "is_anomaly":     "[ANOMALY_ALERT]" in tokens,
-                "latency_ms":     r["latency_ms"],
-                "tokens_out":     r["tokens_out"],
-                "tokens_per_sec": r["tokens_per_sec"],
-                "ram_mb":         r["ram_mb"],
-                "reasoning":      r["reasoning"],
+                "sample":            i,
+                "cluster":           label,
+                "behaviour":         CLUSTER_NAMES.get(label, "?"),
+                "n_tokens_in":       len(tokens),
+                "is_anomaly":        "[ANOMALY_ALERT]" in tokens,
+                "latency_ms":        round(r["wall_ms"], 1),
+                "prompt_eval_count": r["prompt_eval_count"],
+                "prefill_ms":        round(r["prefill_ms"], 1),
+                "tokens_out":        r["eval_count"],
+                "decode_ms":         round(r["decode_ms"], 1),
+                "tokens_per_sec":    round(r["tokens_per_sec"], 2),
+                "schema_valid":      r["schema_valid"],
+                "action":            r["action"],
+                "ram_mb":            round(psutil.Process().memory_info().rss / 1e6, 1),
+                "reasoning":         r["response"],
             })
 
             if (i + 1) % progress_interval == 0:
