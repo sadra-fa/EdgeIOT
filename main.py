@@ -200,19 +200,65 @@ def main():
     print("═"*70)
     tokenizer = SemanticTokenizer()
 
+    # Window k covers rows k .. k+w-1, so its label belongs to the row where
+    # the window ends. Rows without a complete window are treated as NORMAL.
+    w = cfg.anomaly.window_size
+    row_positions = {idx: pos for pos, idx in enumerate(X_processed.index)}
+
+    def anomaly_status_for(row_index):
+        k = row_positions[row_index] - (w - 1)
+        if 0 <= k < len(anomaly_detector.labels):
+            return anomaly_detector.labels[k]
+        return "NORMAL"
+
     outputs = []
+    llm_input_rows = []
     for i in range(len(X_test)):
         row    = X_test.iloc[i]
         tokens = tokenizer.tokenize_row(row)
-        status = (
-            anomaly_detector.labels[i]
-            if i < len(anomaly_detector.labels)
-            else "NORMAL"
-        )
+        status = anomaly_status_for(X_test.index[i])
         tokens = tokenizer.add_anomaly_flag(tokens, status)
         outputs.append(
             build_output_record(y_pred_xgb[i], y_confidence[i], tokens)
         )
+        raw = df.loc[X_test.index[i]]
+        llm_input_rows.append({
+            "row_index":  int(X_test.index[i]),
+            "cluster":    int(y_pred_xgb[i]),
+            "state":      CLUSTER_NAMES.get(int(y_pred_xgb[i]), "unknown"),
+            "confidence": round(float(y_confidence[i]), 4),
+            "tokens":     " ".join(tokens),
+            "anomaly":    status,
+            **{f"z_{c}": round(float(row[c]), 3) for c in cfg.preprocessing.sensor_cols},
+            **{f"raw_{c}": round(float(raw[c]), 2) for c in cfg.preprocessing.sensor_cols},
+            "location":   raw["location"],
+            "behaviour":  raw["behaviour"],
+        })
+    pd.DataFrame(llm_input_rows).to_csv(f"{cfg.output_dir}/llm_inputs.csv", index=False)
+
+    # Metrics used in the dissertation (sanity checks of the upstream stages)
+    cluster_frame = df.assign(cluster=pseudo_labels)
+    pipeline_metrics = {
+        "rows": int(len(df)),
+        "cluster_sizes": {int(k): int(v) for k, v in zip(*np.unique(pseudo_labels, return_counts=True))},
+        "pca_explained_variance": [float(v) for v in pca.explained_variance_ratio_],
+        "accuracy": {c.name: float(c.accuracy) for c in classifiers},
+        "xgb_cv_mean": float(cv_mean),
+        "xgb_cv_std": float(cv_std),
+        "cv": {
+            c.name: [float(v) for v in evaluator.cross_validate(c.model, X_processed, pseudo_labels, cv=5)]
+            for c in classifiers
+        },
+        "feature_columns": list(X_processed.columns),
+        "cluster_vs_behaviour": pd.crosstab(cluster_frame["cluster"], cluster_frame["behaviour"]).to_dict(),
+        "cluster_sensor_means": cluster_frame.groupby("cluster")[cfg.preprocessing.sensor_cols].mean().round(2).to_dict(),
+        "anomaly_windows": int(len(anomaly_detector.labels)),
+        "anomaly_flagged": int(anomaly_detector.n_anomalies),
+        "anomaly_offset": float(anomaly_detector.model.offset_),
+        "test_rows_with_anomaly_flag": int(sum(r["anomaly"] == "ABNORMAL" for r in llm_input_rows)),
+    }
+    with open(f"{cfg.output_dir}/pipeline_metrics.json", "w") as f:
+        json.dump(pipeline_metrics, f, indent=2, default=str)
 
     # Token distribution
     token_counts = tokenizer.token_distribution(

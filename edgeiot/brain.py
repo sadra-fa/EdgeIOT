@@ -82,24 +82,21 @@ def _call_ollama(prompt: str, config: OllamaConfig) -> Dict:
 
 # ── Reply parser ─────────────────────────────────────────────────────────────
 
+# Keywords for the seven canonical actions (edgeiot.semantic.actions)
 _ACTION_KEYWORDS = {
+    "security_alert":   ["security alert", "intruder", "call security",
+                         "alarm"],
     "adjust_ac":        ["turn on air conditioner", "turn on the ac",
                          "cool the room", "lower the temperature",
                          "activate cooling", "turn on cooling",
-                         "air conditioning"],
-    "turn_off_ac":      ["turn off air conditioner", "turn off the ac",
-                         "disable cooling"],
-    "close_windows":    ["close windows", "close the windows",
-                         "shut the windows"],
-    "open_windows":     ["open windows", "open the windows"],
-    "turn_off_lights":  ["turn off lights", "turn off the lights",
+                         "air conditioning", "heating", "raise the temperature"],
+    "dehumidifier_on":  ["dehumidifier", "reduce humidity", "lower the humidity"],
+    "ventilation_on":   ["ventilation", "open windows", "open the windows",
+                         "turn on the fan"],
+    "lights_off":       ["turn off lights", "turn off the lights",
                          "switch off lights"],
-    "turn_on_lights":   ["turn on lights", "turn on the lights",
+    "lights_on":        ["turn on lights", "turn on the lights",
                          "switch on lights"],
-    "reduce_noise":     ["reduce noise", "lower the volume",
-                         "noise reduction"],
-    "security_alert":   ["security alert", "intruder", "call security",
-                         "alarm"],
     "no_action":        ["no action", "no immediate action",
                          "everything is normal", "no changes needed"],
 }

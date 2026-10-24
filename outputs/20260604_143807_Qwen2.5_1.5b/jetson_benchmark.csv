@@ -1,6 +1,0 @@
-sample,cluster,behaviour,n_tokens_in,is_anomaly,latency_ms,tokens_out,tokens_per_sec,ram_mb,reasoning
-0,1,sleeping,3,False,1929.2,39,28.63,281.1,"The predicted behavior is that the user is sleeping due to high humidity, noise spikes, and motion detected. No immediate action is required as the system is designed to handle these events passively."
-1,1,sleeping,1,False,1295.7,22,28.77,281.1,"The user is likely to be asleep as the motion detector is active, so no immediate action is needed."
-2,0,active,1,False,1752.9,34,28.42,281.1,"A temperature alarm has been triggered, indicating that the environment may be too hot, suggesting immediate attention or intervention might be necessary to prevent potential issues related to overheating."
-3,2,away,2,False,1923.6,38,28.84,281.1,The user is likely at work or away from the house due to low temperature and dim lighting detected by the sensors. No immediate action is required as they are not present in the home.
-4,1,sleeping,3,False,2729.3,61,28.78,281.1,"Based on the current sensor events (TEMP_HIGH, HUMIDITY_HIGH, NOISE_SPIKE) and predicted behavior (sleeping), it seems that the system is detecting an unusual increase in temperature, humidity, and noise levels, which may indicate a potential malfunction or emergency situation requiring immediate attention."

@@ -1,6 +1,0 @@
-sample,cluster,behaviour,n_tokens_in,is_anomaly,latency_ms,tokens_out,tokens_per_sec,ram_mb,reasoning
-0,1,sleeping,3,False,10477.4,0,0,80.6,[LLM ERROR: 500 Server Error: Internal Server Error for url: http://localhost:11434/api/generate]
-1,1,sleeping,1,False,11445.5,0,0,79.4,[LLM ERROR: 500 Server Error: Internal Server Error for url: http://localhost:11434/api/generate]
-2,0,active,1,False,11363.1,0,0,79.1,[LLM ERROR: 500 Server Error: Internal Server Error for url: http://localhost:11434/api/generate]
-3,2,away,2,False,10810.2,0,0,79.4,[LLM ERROR: 500 Server Error: Internal Server Error for url: http://localhost:11434/api/generate]
-4,1,sleeping,3,False,11150.5,0,0,79.2,[LLM ERROR: 500 Server Error: Internal Server Error for url: http://localhost:11434/api/generate]

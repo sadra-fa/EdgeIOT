@@ -1,4 +1,0 @@
-sample,cluster,behaviour,n_tokens_in,is_anomaly,latency_ms,tokens_out,tokens_per_sec,ram_mb,reasoning
-0,1,sleeping,3,False,2384.8,41,22.64,258.1,"It appears that the homeowner is likely waking up from sleep, triggering an alert due to the noise spike, so I should send a notification to the homeowner's phone or smart speaker to wake them up."
-1,1,sleeping,1,False,2906.6,48,21.99,257.6,"It appears that the motion sensor has detected movement within the home, indicating that someone or something is active, which contradicts the predicted behavior of sleeping, suggesting that an alert or notification may be necessary to notify occupants or trigger a response."
-2,0,active,1,False,2293.7,36,22.25,257.6,"The high temperature sensor event indicates that the room's temperature has exceeded a predetermined threshold, triggering an alert to activate the cooling system or other measures to maintain a comfortable indoor climate."

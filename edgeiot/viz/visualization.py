@@ -233,7 +233,7 @@ class PipelineVisualizer:
 
         # Tokens/sec by behaviour
         ax = axes[1, 0]; self._style_ax(ax)
-        for beh, col in zip(["active", "sleeping", "away"], [OK, ACCENT, WARN]):
+        for beh, col in zip(["sedentary", "active", "sleeping"], [OK, ACCENT, WARN]):
             subset = df_bench[df_bench["behaviour"] == beh]["tokens_per_sec"]
             if len(subset):
                 ax.hist(subset, bins=15, color=col, alpha=0.7, label=beh)
