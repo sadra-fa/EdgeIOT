@@ -2,7 +2,7 @@
 
 An edge AI pipeline for smart-home sensor data, developed for the MESW dissertation *Edge LLM Optimization* (FEUP). It preprocesses environmental readings, assigns a behavioural state, flags anomalies, translates the readings into semantic tokens, and asks a local Large Language Model (via Ollama) for one of seven smart-home actions in JSON – all running on-device on an **NVIDIA Jetson Orin Nano**. A rule-based baseline, a response cache and QLoRA fine-tuned models that run on the Jetson are included.
 
-**Dataset.** `RealLife.csv` was downloaded from Kaggle (source page not recorded). Its content is synthetic (no timestamps, physically impossible values, mostly non-home locations) and its rows are independent samples, not a time series; it is used as a proxy stream of sensor readings.
+**Dataset.** `RealLife.csv` was downloaded from Kaggle (source page: https://data.mendeley.com/datasets/ckwvzf7pzt/1). Its content is synthetic (no timestamps, physically impossible values, mostly non-home locations) and its rows are independent samples, not a time series; it is used as a proxy stream of sensor readings.
 
 ---
 
